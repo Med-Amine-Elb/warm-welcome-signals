@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -6,6 +5,11 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Calendar, Navigation, Fuel, Car, Users, Info } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 // Car inventory data
 const carsInventory = [
@@ -41,7 +45,7 @@ const carsInventory = [
       "Éclairage d'ambiance personnalisable"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1563720223523-499192634d8c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTd8fG1lcmNlZGVzJTIwYW1nJTIwZ3R8ZW58MHwwfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1563720223523-499192634d8c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fG1lcmNlZGVzJTIwYW1nJTIwZ3R8ZW58MHwwfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
       "https://images.unsplash.com/photo-1577495508326-19a1b3cf65b1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8bWVyY2VkZXMlMjBhbWclMjBpbnRlcmlvcnxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
       "https://images.unsplash.com/photo-1621069269775-2c7b33a51eaa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bWVyY2VkZXMlMjBhbWclMjBlbmdpbmV8ZW58MHwwfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
     ]
@@ -238,6 +242,17 @@ const VehicleDetail = () => {
   const [car, setCar] = useState<any>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [showTestDriveDialog, setShowTestDriveDialog] = useState(false);
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
+  const [showFinanceDialog, setShowFinanceDialog] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    date: '',
+    message: '',
+  });
+  const { toast } = useToast();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -254,6 +269,59 @@ const VehicleDetail = () => {
       setLoading(false);
     }
   }, [id]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleTestDriveSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Réservation d'essai confirmée",
+      description: `Nous vous contacterons bientôt pour confirmer votre essai de ${car.name}.`,
+    });
+    setShowTestDriveDialog(false);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      date: '',
+      message: '',
+    });
+  };
+
+  const handleInfoSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Demande d'informations envoyée",
+      description: `Nous vous enverrons plus d'informations sur ${car.name} dans les plus brefs délais.`,
+    });
+    setShowInfoDialog(false);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      date: '',
+      message: '',
+    });
+  };
+
+  const handleFinanceSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Demande de financement envoyée",
+      description: `Notre équipe financière vous contactera pour discuter des options de financement pour ${car.name}.`,
+    });
+    setShowFinanceDialog(false);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      date: '',
+      message: '',
+    });
+  };
 
   if (loading) {
     return (
@@ -454,14 +522,25 @@ const VehicleDetail = () => {
                 </div>
                 
                 <div className="pt-4 space-y-4">
-                  <Button className="w-full bg-accent hover:bg-accent/80 text-white">
+                  <Button 
+                    className="w-full bg-accent hover:bg-accent/80 text-white"
+                    onClick={() => setShowTestDriveDialog(true)}
+                  >
                     Réserver un essai
                   </Button>
                   <div className="flex gap-4">
-                    <Button variant="outline" className="flex-1 border-primary text-primary hover:bg-primary hover:text-white">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 border-primary text-primary hover:bg-primary hover:text-white"
+                      onClick={() => setShowInfoDialog(true)}
+                    >
                       Demander plus d'informations
                     </Button>
-                    <Button variant="outline" className="flex-1 border-primary text-primary hover:bg-primary hover:text-white">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 border-primary text-primary hover:bg-primary hover:text-white"
+                      onClick={() => setShowFinanceDialog(true)}
+                    >
                       Financement
                     </Button>
                   </div>
@@ -526,7 +605,7 @@ const VehicleDetail = () => {
                     Nous appeler
                   </Button>
                   <Button className="bg-accent hover:bg-accent/80">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                     Nous contacter
                   </Button>
                 </div>
@@ -535,6 +614,202 @@ const VehicleDetail = () => {
           </div>
         </section>
       </main>
+      
+      {/* Test Drive Dialog */}
+      <Dialog open={showTestDriveDialog} onOpenChange={setShowTestDriveDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Réserver un essai</DialogTitle>
+            <DialogDescription>
+              Complétez le formulaire ci-dessous pour réserver un essai de {car?.name}.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleTestDriveSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Nom complet</Label>
+                <Input 
+                  id="name" 
+                  name="name" 
+                  value={formData.name} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  value={formData.email} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Téléphone</Label>
+                <Input 
+                  id="phone" 
+                  name="phone" 
+                  type="tel" 
+                  value={formData.phone} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="date">Date préférée</Label>
+                <Input 
+                  id="date" 
+                  name="date" 
+                  type="date" 
+                  value={formData.date} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="message">Message (optionnel)</Label>
+                <Textarea 
+                  id="message" 
+                  name="message" 
+                  value={formData.message} 
+                  onChange={handleInputChange} 
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Confirmer la réservation</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Info Request Dialog */}
+      <Dialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Demande d'informations</DialogTitle>
+            <DialogDescription>
+              Complétez le formulaire ci-dessous pour recevoir plus d'informations sur {car?.name}.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleInfoSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Nom complet</Label>
+                <Input 
+                  id="name" 
+                  name="name" 
+                  value={formData.name} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  value={formData.email} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Téléphone</Label>
+                <Input 
+                  id="phone" 
+                  name="phone" 
+                  type="tel" 
+                  value={formData.phone} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="message">Questions spécifiques</Label>
+                <Textarea 
+                  id="message" 
+                  name="message" 
+                  value={formData.message} 
+                  onChange={handleInputChange} 
+                  rows={3}
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Envoyer la demande</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Financing Dialog */}
+      <Dialog open={showFinanceDialog} onOpenChange={setShowFinanceDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Demande de financement</DialogTitle>
+            <DialogDescription>
+              Complétez le formulaire ci-dessous pour recevoir des options de financement pour {car?.name} à {car?.price} €.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleFinanceSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Nom complet</Label>
+                <Input 
+                  id="name" 
+                  name="name" 
+                  value={formData.name} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  value={formData.email} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Téléphone</Label>
+                <Input 
+                  id="phone" 
+                  name="phone" 
+                  type="tel" 
+                  value={formData.phone} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="message">Informations supplémentaires</Label>
+                <Textarea 
+                  id="message" 
+                  name="message" 
+                  value={formData.message} 
+                  onChange={handleInputChange} 
+                  rows={3}
+                  placeholder="Acompte, durée de financement souhaitée, etc."
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Demander un financement</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
       
       <Footer />
     </div>
