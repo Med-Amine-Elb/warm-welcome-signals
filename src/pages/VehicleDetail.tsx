@@ -110,7 +110,7 @@ const carsInventory = [
       "Système audio Harman Kardon",
       "Freins M Compound",
       "Suspension adaptative M",
-      "Jantes M en alliage léger 19"/20"",
+      "Jantes M en alliage léger 19\"/20\"",
       "Différentiel actif M",
       "Pack Carbone M"
     ],
