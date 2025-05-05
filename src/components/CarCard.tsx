@@ -2,6 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Navigation } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface Car {
   id: number;
@@ -53,12 +54,14 @@ const CarCard = ({ car }: CarCardProps) => {
         </div>
         
         <div className="grid grid-cols-2 gap-4 mt-5">
-          <Button 
-            variant="outline" 
-            className="text-sm border-primary text-primary hover:bg-primary hover:text-white"
-          >
-            Détails
-          </Button>
+          <Link to={`/vehicle/${car.id}`} className="w-full">
+            <Button 
+              variant="outline" 
+              className="text-sm border-primary text-primary hover:bg-primary hover:text-white w-full"
+            >
+              Détails
+            </Button>
+          </Link>
           <Button 
             className="text-sm bg-accent hover:bg-accent/80 text-white"
           >

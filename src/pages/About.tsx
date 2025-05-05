@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -38,30 +37,13 @@ const timeline = [
   }
 ];
 
+// Updated team with only one person
 const team = [
   {
     name: "Alexandre Dupont",
-    role: "Directeur Général",
+    role: "Fondateur & Développeur",
     image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8YnVzaW5lc3MlMjBtYW58ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60",
-    description: "Passionné d'automobile depuis plus de 25 ans, Alexandre a fondé DriveLuxe avec la vision de créer une expérience client inégalée dans le secteur automobile de luxe."
-  },
-  {
-    name: "Sophie Martin",
-    role: "Directrice Commerciale",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8YnVzaW5lc3MlMjB3b21hbnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-    description: "Avec son expertise en marketing de luxe, Sophie dirige notre équipe commerciale et développe des stratégies innovantes pour enrichir l'expérience client."
-  },
-  {
-    name: "Thomas Leroy",
-    role: "Chef Mécanicien",
-    image: "https://images.unsplash.com/photo-1618675067902-2aa56b32a3e7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fG1lY2hhbmljfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    description: "Fort de ses 20 ans d'expérience chez les plus grands constructeurs, Thomas supervise notre atelier technique et garantit l'excellence de nos services d'entretien."
-  },
-  {
-    name: "Marie Dubois",
-    role: "Responsable Relation Client",
-    image: "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mjh8fGJ1c2luZXNzJTIwd29tYW58ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60",
-    description: "Marie veille à ce que chaque client bénéficie d'un suivi personnalisé et d'une attention aux détails qui font la différence."
+    description: "Passionné de technologie et d'automobile depuis toujours, j'ai créé DriveLuxe pour offrir une expérience client exceptionnelle dans le monde des voitures de luxe. Je suis le seul créateur et développeur derrière cette plateforme."
   }
 ];
 
@@ -182,35 +164,33 @@ const About = () => {
           </div>
         </section>
         
-        {/* Team Section */}
+        {/* Team Section - Updated to show only one person */}
         <section className="section-padding bg-card">
           <div className="container mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">Notre Équipe</h2>
+              <h2 className="text-3xl font-bold mb-4">L'Équipe</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Des passionnés d'automobile dévoués à vous offrir un service d'exception.
+                Découvrez le créateur derrière DriveLuxe.
               </p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {team.map((member, index) => (
-                <div key={index} className="animate-fade-in opacity-0" style={{ animationDelay: `${index * 200}ms`, animationFillMode: 'forwards' }}>
-                  <Card className="glass-card overflow-hidden hover-scale">
-                    <div className="aspect-w-1 aspect-h-1">
-                      <img 
-                        src={member.image} 
-                        alt={member.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-semibold mb-1">{member.name}</h3>
-                      <p className="text-primary font-medium text-sm mb-4">{member.role}</p>
-                      <p className="text-sm text-muted-foreground">{member.description}</p>
-                    </div>
-                  </Card>
-                </div>
-              ))}
+            <div className="max-w-md mx-auto">
+              <div className="animate-fade-in opacity-0" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+                <Card className="glass-card overflow-hidden hover-scale">
+                  <div className="aspect-w-1 aspect-h-1">
+                    <img 
+                      src={team[0].image} 
+                      alt={team[0].name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-6 text-center">
+                    <h3 className="text-2xl font-semibold mb-1">{team[0].name}</h3>
+                    <p className="text-primary font-medium text-md mb-4">{team[0].role}</p>
+                    <p className="text-muted-foreground">{team[0].description}</p>
+                  </div>
+                </Card>
+              </div>
             </div>
           </div>
         </section>
