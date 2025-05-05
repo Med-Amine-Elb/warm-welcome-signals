@@ -173,7 +173,7 @@ const Vehicles = () => {
                         <SelectValue placeholder="Toutes les marques" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Toutes les marques</SelectItem>
+                        <SelectItem value="all">Toutes les marques</SelectItem>
                         {brands.map(brand => (
                           <SelectItem key={brand} value={brand}>{brand}</SelectItem>
                         ))}
@@ -192,7 +192,7 @@ const Vehicles = () => {
                         <SelectValue placeholder="Toutes les catégories" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Toutes les catégories</SelectItem>
+                        <SelectItem value="all">Toutes les catégories</SelectItem>
                         {categories.map(category => (
                           <SelectItem key={category} value={category}>{category}</SelectItem>
                         ))}
