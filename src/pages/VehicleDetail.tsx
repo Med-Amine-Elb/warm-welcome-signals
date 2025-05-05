@@ -156,7 +156,7 @@ const carsInventory = [
       "Pack Chrono Sport avec sélecteur de mode"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8cG9yc2NoZSUyMDkxMXxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1503376780353-7e66927e09f6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8cG9yc2NoZSUyMDkxMXxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
       "https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fHBvcnNjaGUlMjA5MTElMjBpbnRlcmlvcnxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
       "https://images.unsplash.com/photo-1571607388263-1044f9ea01dd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8cG9yc2NoZSUyMDkxMSUyMGVuZ2luZXxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
     ]
@@ -195,7 +195,7 @@ const carsInventory = [
     gallery: [
       "https://images.unsplash.com/photo-1580414057403-c5f451f30e1c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZ2Ugcm92ZXIlMjBzcG9ydHxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
       "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8cmFuZ2Ulcm92ZXIlMjBpbnRlcmlvcnxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1550759340-a22a8f7e09f6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHJhbmdlJTIwcm92ZXIlMjBlbmdpbmV8ZW58MHwwfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1550759340-a22a8f7e09f6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHJhbmdlJTIwcm92ZXIlMjBlbmdpbmV8ZW58MHwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
     ]
   },
   {
@@ -298,6 +298,22 @@ const VehicleDetail = () => {
       description: `Nous vous enverrons plus d'informations sur ${car.name} dans les plus brefs délais.`,
     });
     setShowInfoDialog(false);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      date: '',
+      message: '',
+    });
+  };
+
+  const handleFinanceSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Demande de financement envoyée",
+      description: `Nous vous contacterons bientôt concernant les options de financement pour ${car.name}.`,
+    });
+    setShowFinanceDialog(false);
     setFormData({
       name: '',
       email: '',
