@@ -71,16 +71,16 @@ const Footer = () => {
               <li className="flex items-start space-x-3">
                 <Navigation className="w-5 h-5 text-primary mt-0.5" />
                 <span className="text-sm text-muted-foreground">
-                  123 Avenue des Champs-Élysées, 75008 Paris, France
+                  32 Boulevard d'Anfa, Casablanca 20100, Maroc
                 </span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-primary" />
-                <span className="text-sm text-muted-foreground">+33 1 23 45 67 89</span>
+                <span className="text-sm text-muted-foreground">+212 522 123 456</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-primary" />
-                <span className="text-sm text-muted-foreground">contact@driveluxe.com</span>
+                <span className="text-sm text-muted-foreground">contact@driveluxe.ma</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Calendar className="w-5 h-5 text-primary" />
