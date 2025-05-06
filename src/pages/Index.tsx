@@ -3,10 +3,9 @@ import { useEffect, useRef } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
-import FeaturedCars from '@/components/FeaturedCars';
-import AboutSection from '@/components/AboutSection';
 import ServiceCard from '@/components/ServiceCard';
 import { Calendar, Car, Search, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const services = [
   {
@@ -32,24 +31,18 @@ const services = [
 ];
 
 const Index = () => {
-  // Refs for scroll animation sections
-  const servicesRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
-  
+  // Initialize scroll animations
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    // Initialize scroll animations
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        // Add animation classes when element enters viewport
         if (entry.isIntersecting) {
           entry.target.classList.add('animate-in');
         }
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
     
-    // Target elements with data-scroll attribute
     document.querySelectorAll('[data-scroll]').forEach(el => {
       observer.observe(el);
     });
@@ -58,94 +51,146 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen">
       <Navbar />
       
       <main>
         <HeroSection 
-          title="L'Excellence Automobile à Votre Portée"
+          title="L'Excellence Automobile"
           subtitle="Découvrez notre collection exclusive de voitures de luxe et vivez une expérience automobile sans égale."
           ctaText="Explorer notre collection"
         />
         
-        <div className="relative overflow-hidden">
-          <FeaturedCars />
-          
-          <div ref={servicesRef} className="section-padding bg-background relative z-10">
-            <div className="container mx-auto">
-              <div 
-                className="text-center mb-16 opacity-0" 
-                data-scroll="fade-up"
-              >
-                <h2 className="text-3xl md:text-5xl font-bold mb-6 text-gradient relative">
-                  Nos Services Premium
-                  <span className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-accent"></span>
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-                  Nous offrons une gamme complète de services pour répondre à tous vos besoins automobiles.
+        {/* Featured Cars Section - UJET-inspired layout */}
+        <section className="py-24 px-6 md:px-16 bg-white">
+          <div className="container mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-16">
+              <div className="mb-8 md:mb-0">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">Véhicules en Vedette</h2>
+                <div className="w-16 h-1 bg-black mb-6"></div>
+                <p className="max-w-md text-gray-600">
+                  Découvrez notre sélection des plus belles voitures de luxe disponibles dès maintenant.
                 </p>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-                {services.map((service, index) => (
-                  <div 
-                    key={index} 
-                    className="opacity-0" 
-                    data-scroll="fade-up"
-                    style={{ transitionDelay: `${index * 150}ms` }}
-                  >
-                    <ServiceCard 
-                      icon={service.icon}
-                      title={service.title}
-                      description={service.description}
-                      index={index}
-                    />
+              <Link to="/vehicles" className="btn-ujet mt-4">
+                Voir tous les véhicules
+              </Link>
+            </div>
+            
+            <div data-scroll="fade-up" className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Will use existing FeaturedCars component that can't be modified */}
+            </div>
+          </div>
+        </section>
+        
+        {/* Services Section - Split layout inspired by UJET */}
+        <section className="split-layout full-bleed">
+          {/* Left panel */}
+          <div className="bg-black text-white py-24 px-6 md:px-16 flex items-center">
+            <div className="max-w-xl">
+              <h2 data-scroll="fade-up" className="text-4xl md:text-5xl font-bold mb-8">
+                Nos Services Premium
+              </h2>
+              <p data-scroll="fade-up" className="text-xl mb-10 opacity-80">
+                Nous offrons une gamme complète de services pour répondre à tous vos besoins automobiles.
+              </p>
+              <Link to="/services" data-scroll="fade-up" className="inline-block border border-white py-3 px-8 uppercase text-sm tracking-wider hover:bg-white hover:text-black transition-colors">
+                Tous nos services
+              </Link>
+            </div>
+          </div>
+          
+          {/* Right panel */}
+          <div className="bg-white py-24 px-6 md:px-16">
+            <div className="grid grid-cols-1 gap-6 md:gap-10">
+              {services.map((service, index) => (
+                <div 
+                  key={index} 
+                  className="opacity-0" 
+                  data-scroll="fade-left"
+                  style={{ '--scroll-delay': index * 2 } as React.CSSProperties}
+                >
+                  <div className="flex items-start">
+                    <div className="bg-gray-100 p-4 rounded-full mr-6">
+                      {service.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">{service.title}</h3>
+                      <p className="text-gray-600">{service.description}</p>
+                    </div>
                   </div>
-                ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        {/* About Section - UJET-inspired design */}
+        <section className="py-24 px-6 md:px-16 bg-white">
+          <div className="container mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div data-scroll="fade-right">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6">Notre Histoire</h2>
+                <div className="w-16 h-1 bg-black mb-8"></div>
+                <p className="text-gray-600 mb-6">
+                  Fondée en 2005, DriveLuxe s'est imposée comme la référence des concessions automobiles de luxe en France. Notre passion pour l'excellence automobile nous a conduits à sélectionner rigoureusement les véhicules les plus prestigieux pour notre clientèle exigeante.
+                </p>
+                <p className="text-gray-600 mb-10">
+                  Chez DriveLuxe, nous ne vendons pas simplement des voitures, nous offrons une expérience complète, de la recherche du véhicule idéal à l'entretien régulier, en passant par des services personnalisés qui font notre réputation.
+                </p>
+                <Link to="/about" className="btn-ujet">
+                  En savoir plus
+                </Link>
+              </div>
+              
+              <div className="relative" data-scroll="fade-left">
+                <img 
+                  src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80"
+                  alt="Showroom de voitures de luxe"
+                  className="w-full h-auto"
+                />
+                <div className="absolute -bottom-6 -left-6 w-1/2 h-24 bg-black z-0"></div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
         
-        <AboutSection />
-        
-        <section ref={ctaRef} className="relative py-32 overflow-hidden">
-          <div 
-            className="absolute inset-0 bg-cover bg-center opacity-20 scale-105 transition-transform duration-1000" 
-            style={{ 
-              backgroundImage: "url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=80')",
-              transform: 'scale(1.05)'
-            }} 
-            data-scroll="zoom-out"
-          />
-          <div className="absolute inset-0 bg-card/80" />
-          <div 
-            className="relative z-10 container mx-auto text-center px-4 opacity-0" 
-            data-scroll="fade-up"
-          >
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 text-gradient max-w-4xl mx-auto">
-              Prêt à découvrir votre prochaine voiture de rêve ?
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              Prenez rendez-vous dès aujourd'hui pour un essai personnalisé ou visitez notre showroom.
-            </p>
-            <div 
-              className="flex flex-col sm:flex-row gap-4 justify-center opacity-0" 
-              data-scroll="fade-up"
-              style={{ transitionDelay: '200ms' }}
-            >
-              <a 
-                href="#" 
-                className="bg-accent hover:bg-accent/80 text-white px-8 py-3 rounded-md font-medium transition-colors transform hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+        {/* Full-width CTA Section */}
+        <section className="relative py-32 overflow-hidden bg-black text-white">
+          <div className="container mx-auto px-6 md:px-16">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 
+                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8" 
+                data-scroll="fade-up"
               >
-                Prendre rendez-vous
-              </a>
-              <a 
-                href="#" 
-                className="bg-transparent border border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-md font-medium transition-colors transform hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+                Prêt à découvrir votre prochaine voiture de rêve ?
+              </h2>
+              <p 
+                className="text-xl opacity-80 mb-12"
+                data-scroll="fade-up"
+                style={{ '--scroll-delay': 2 } as React.CSSProperties}
               >
-                Nous contacter
-              </a>
+                Prenez rendez-vous dès aujourd'hui pour un essai personnalisé ou visitez notre showroom.
+              </p>
+              <div 
+                className="flex flex-col sm:flex-row gap-6 justify-center"
+                data-scroll="fade-up"
+                style={{ '--scroll-delay': 4 } as React.CSSProperties}
+              >
+                <Link 
+                  to="/contact" 
+                  className="btn-ujet bg-white text-black hover:bg-gray-200"
+                >
+                  Prendre rendez-vous
+                </Link>
+                <Link 
+                  to="/contact" 
+                  className="border border-white text-white px-8 py-3 uppercase text-sm tracking-wider font-medium 
+                            transition-all hover:bg-white hover:text-black"
+                >
+                  Nous contacter
+                </Link>
+              </div>
             </div>
           </div>
         </section>

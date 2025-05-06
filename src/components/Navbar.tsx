@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 
 const Navbar = () => {
@@ -26,82 +25,94 @@ const Navbar = () => {
   return (
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-background/90 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent py-6'
+        isScrolled ? 'bg-white py-4' : 'bg-transparent py-8'
       }`}
     >
-      <div className="container mx-auto px-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold text-gradient">DriveLuxe</span>
+      <div className="container mx-auto px-6 md:px-16 flex items-center justify-between">
+        <Link to="/" className="flex items-center">
+          <span className="text-3xl font-bold tracking-tight">DriveLuxe</span>
         </Link>
         
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">
+        <nav className="hidden md:flex items-center space-x-12">
+          <Link to="/" className="text-sm font-medium uppercase tracking-wider hover:text-black/70 transition-colors">
             Accueil
           </Link>
-          <Link to="/vehicles" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link to="/vehicles" className="text-sm font-medium uppercase tracking-wider hover:text-black/70 transition-colors">
             Voitures
           </Link>
-          <Link to="/services" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link to="/services" className="text-sm font-medium uppercase tracking-wider hover:text-black/70 transition-colors">
             Services
           </Link>
-          <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link to="/about" className="text-sm font-medium uppercase tracking-wider hover:text-black/70 transition-colors">
             À Propos
           </Link>
-          <Button variant="default" className="bg-accent hover:bg-accent/90 text-white">
+          <Link to="/contact" className="btn-ujet">
             Contact
-          </Button>
+          </Link>
         </nav>
 
         {/* Mobile Menu Button */}
-        <Button 
-          variant="ghost"
-          size="icon"
+        <button 
           className="md:hidden"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           <Menu className="h-6 w-6" />
-        </Button>
+        </button>
       </div>
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <nav className="md:hidden bg-card/95 backdrop-blur-lg p-4 animate-fade-in">
-          <div className="flex flex-col space-y-4">
+        <nav className="md:hidden bg-white p-6 animate-fade-in">
+          <div className="flex flex-col space-y-6">
             <Link 
               to="/" 
-              className="text-sm font-medium hover:text-primary transition-colors py-2"
+              className="text-sm font-medium uppercase tracking-wider"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Accueil
             </Link>
             <Link 
               to="/vehicles" 
-              className="text-sm font-medium hover:text-primary transition-colors py-2"
+              className="text-sm font-medium uppercase tracking-wider"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Voitures
             </Link>
             <Link 
               to="/services" 
-              className="text-sm font-medium hover:text-primary transition-colors py-2"
+              className="text-sm font-medium uppercase tracking-wider"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Services
             </Link>
             <Link 
               to="/about" 
-              className="text-sm font-medium hover:text-primary transition-colors py-2"
+              className="text-sm font-medium uppercase tracking-wider"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               À Propos
             </Link>
-            <Button variant="default" className="w-full bg-accent hover:bg-accent/90 text-white">
+            <Link 
+              to="/contact" 
+              className="btn-ujet w-full flex justify-center"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               Contact
-            </Button>
+            </Link>
           </div>
         </nav>
       )}
+      
+      {/* Floating Schedule Button (Inspired by the UJET design) */}
+      <div className="hidden lg:block">
+        <Link to="/contact" className="floating-button">
+          <div className="text-xs uppercase tracking-wider text-center leading-tight">
+            <span className="block">Prendre</span>
+            <span className="block">RDV</span>
+          </div>
+        </Link>
+      </div>
     </header>
   );
 };
