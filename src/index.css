@@ -79,6 +79,47 @@
   html {
     @apply scroll-smooth;
   }
+  
+  /* Scroll Animation Classes */
+  [data-scroll] {
+    transition: opacity 1s ease, transform 1s ease;
+    transition-delay: calc(var(--scroll-delay, 0) * 100ms);
+  }
+  
+  [data-scroll="fade-up"] {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  
+  [data-scroll="fade-down"] {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  
+  [data-scroll="fade-left"] {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+  
+  [data-scroll="fade-right"] {
+    transform: translateX(-30px);
+    opacity: 0;
+  }
+  
+  [data-scroll="zoom-in"] {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  
+  [data-scroll="zoom-out"] {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+  
+  .animate-in {
+    opacity: 1 !important;
+    transform: translate(0, 0) scale(1) !important;
+  }
 }
 
 #root {
@@ -88,3 +129,17 @@
   padding: 0;
   text-align: left;
 }
+
+/* Parallax effect for background images */
+.parallax-bg {
+  transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+  will-change: transform;
+}
+
+/* Stagger animation delays */
+.stagger-animation > *:nth-child(1) { --scroll-delay: 0; }
+.stagger-animation > *:nth-child(2) { --scroll-delay: 2; }
+.stagger-animation > *:nth-child(3) { --scroll-delay: 4; }
+.stagger-animation > *:nth-child(4) { --scroll-delay: 6; }
+.stagger-animation > *:nth-child(5) { --scroll-delay: 8; }
+.stagger-animation > *:nth-child(6) { --scroll-delay: 10; }
