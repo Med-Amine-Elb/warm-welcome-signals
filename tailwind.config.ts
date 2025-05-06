@@ -109,6 +109,18 @@ export default {
 				'car-drive-in': {
 					'0%': { transform: 'translateX(-100%)' },
 					'100%': { transform: 'translateX(0)' }
+				},
+				'text-reveal': {
+					'0%': { 'clip-path': 'inset(0 100% 0 0)' },
+					'100%': { 'clip-path': 'inset(0 0 0 0)' }
+				},
+				'spin-slow': {
+					'0%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(360deg)' }
+				},
+				'bounce-slow': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(10px)' }
 				}
 			},
 			animation: {
@@ -120,6 +132,9 @@ export default {
 				'slide-right': 'slide-right 0.6s ease-out',
 				'zoom-in': 'zoom-in 0.4s ease-out',
 				'car-drive-in': 'car-drive-in 1s ease-out',
+				'text-reveal': 'text-reveal 1.2s cubic-bezier(0.165, 0.84, 0.44, 1)',
+				'spin-slow': 'spin-slow 15s linear infinite',
+				'bounce-slow': 'bounce-slow 2s infinite ease-in-out'
 			}
 		}
 	},

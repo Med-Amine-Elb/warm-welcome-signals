@@ -1,36 +1,47 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Vehicles from "./pages/Vehicles"; 
-import VehicleDetail from "./pages/VehicleDetail";
-import Services from "./pages/Services";
-import About from "./pages/About";
-import NotFound from "./pages/NotFound";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Index from './pages/Index';
+import About from './pages/About';
+import Services from './pages/Services';
+import Vehicles from './pages/Vehicles';
+import VehicleDetail from './pages/VehicleDetail';
+import NotFound from './pages/NotFound';
+import './App.css';
+import ScrollAnimation from './components/ScrollAnimation';
 
-const queryClient = new QueryClient();
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Index />
+  },
+  {
+    path: '/about',
+    element: <About />
+  },
+  {
+    path: '/services',
+    element: <Services />
+  },
+  {
+    path: '/vehicles',
+    element: <Vehicles />
+  },
+  {
+    path: '/vehicles/:id',
+    element: <VehicleDetail />
+  },
+  {
+    path: '*',
+    element: <NotFound />
+  }
+]);
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/vehicles" element={<Vehicles />} />
-          <Route path="/vehicle/:id" element={<VehicleDetail />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/about" element={<About />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </TooltipProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <ScrollAnimation>
+      <RouterProvider router={router} />
+    </ScrollAnimation>
+  );
+};
 
 export default App;

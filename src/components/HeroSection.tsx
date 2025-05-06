@@ -22,15 +22,15 @@ const HeroSection = ({
   const contentRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Parallax effect on scroll
+    // Enhanced parallax effect on scroll
     const handleScroll = () => {
       if (!bgRef.current || !contentRef.current) return;
       
       const scrollY = window.scrollY;
-      const parallaxValue = scrollY * 0.4;
-      const opacityValue = 1 - (scrollY / 700);
+      const parallaxValue = scrollY * 0.5; // Increased effect
+      const opacityValue = 1 - (scrollY / 600); // Faster fade
       
-      bgRef.current.style.transform = `translateY(${parallaxValue}px)`;
+      bgRef.current.style.transform = `translateY(${parallaxValue}px) scale(${1 + scrollY * 0.0005})`;
       
       if (opacityValue > 0) {
         contentRef.current.style.opacity = opacityValue.toString();
@@ -71,14 +71,14 @@ const HeroSection = ({
           </div>
         </div>
         
-        {/* Right side: Image */}
+        {/* Right side: Image with enhanced parallax and scaling */}
         <div className="hidden md:block relative overflow-hidden">
           <div 
             ref={bgRef}
             className="absolute inset-0 bg-cover bg-center"
             style={{ 
               backgroundImage: `url(${backgroundImage})`,
-              transition: 'transform 0.5s ease-out'
+              transition: 'transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)'
             }}
           />
         </div>
@@ -90,11 +90,13 @@ const HeroSection = ({
         style={{ backgroundImage: `url(${backgroundImage})` }}
       />
       
-      {/* Scroll indicator */}
+      {/* Scroll indicator - UJET style with dot animation */}
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20">
         <div className="flex flex-col items-center">
           <span className="text-xs uppercase tracking-wider mb-2">Scroll</span>
-          <div className="w-0.5 h-8 bg-black/20 animate-pulse" />
+          <div className="w-0.5 h-8 bg-black/20 relative">
+            <div className="absolute w-1.5 h-1.5 -left-0.5 rounded-full bg-black animate-bounce-slow" />
+          </div>
         </div>
       </div>
     </section>
