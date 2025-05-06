@@ -6,8 +6,8 @@ import Services from './pages/Services';
 import Vehicles from './pages/Vehicles';
 import VehicleDetail from './pages/VehicleDetail';
 import NotFound from './pages/NotFound';
-import './App.css';
 import ScrollAnimation from './components/ScrollAnimation';
+import './App.css';
 
 const router = createBrowserRouter([
   {

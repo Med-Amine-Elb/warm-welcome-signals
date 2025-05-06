@@ -1,12 +1,10 @@
 
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import CarCard from '@/components/CarCard';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 
 // Car inventory data
 const carsInventory = [
@@ -16,9 +14,6 @@ const carsInventory = [
     price: "145 900",
     image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fG1lcmNlZGVzJTIwYW1nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
     year: 2023,
-    mileage: "9 000",
-    fuelType: "Essence",
-    brand: "Mercedes-Benz",
     category: "Sport"
   },
   {
@@ -27,9 +22,6 @@ const carsInventory = [
     price: "189 500",
     image: "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8YXVkaSUyMHI4fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
     year: 2022,
-    mileage: "12 500",
-    fuelType: "Essence",
-    brand: "Audi",
     category: "Sport"
   },
   {
@@ -38,9 +30,6 @@ const carsInventory = [
     price: "98 750",
     image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTV8fGJtdyUyMG00fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
     year: 2023,
-    mileage: "5 200",
-    fuelType: "Essence",
-    brand: "BMW",
     category: "Sport"
   },
   {
@@ -49,233 +38,116 @@ const carsInventory = [
     price: "155 400",
     image: "https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cG9yc2NoZSUyMDkxMXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
     year: 2022,
-    mileage: "18 350",
-    fuelType: "Essence",
-    brand: "Porsche",
     category: "Sport"
-  },
-  {
-    id: 5,
-    name: "Range Rover Sport",
-    price: "122 900",
-    image: "https://images.unsplash.com/photo-1529440547539-b8507892316d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8cmFuZ2Ugcm92ZXJ8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60",
-    year: 2023,
-    mileage: "7 200",
-    fuelType: "Diesel",
-    brand: "Land Rover",
-    category: "SUV"
-  },
-  {
-    id: 6,
-    name: "Bentley Continental GT",
-    price: "245 700",
-    image: "https://images.unsplash.com/photo-1522686978237-a3962b9e959e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YmVudGxleXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-    year: 2022,
-    mileage: "15 200",
-    fuelType: "Essence",
-    brand: "Bentley",
-    category: "GT"
-  },
+  }
 ];
 
 const Vehicles = () => {
-  const [cars, setCars] = useState(carsInventory);
-  const [filters, setFilters] = useState({
-    search: "",
-    brand: "",
-    category: "",
-    minPrice: 0,
-    maxPrice: 300000,
-  });
-  
+  const [activeCar, setActiveCar] = useState(carsInventory[0]);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
-  
-  useEffect(() => {
-    // Filter cars based on current filters
-    const filteredCars = carsInventory.filter(car => {
-      const matchesSearch = car.name.toLowerCase().includes(filters.search.toLowerCase()) || 
-                           car.brand.toLowerCase().includes(filters.search.toLowerCase());
-      const matchesBrand = !filters.brand || car.brand === filters.brand;
-      const matchesCategory = !filters.category || car.category === filters.category;
-      const price = parseInt(car.price.replace(/\s/g, ''));
-      const matchesPrice = price >= filters.minPrice && price <= filters.maxPrice;
-      
-      return matchesSearch && matchesBrand && matchesCategory && matchesPrice;
-    });
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
     
-    setCars(filteredCars);
-  }, [filters]);
-  
-  // Extract unique brands and categories for filters
-  const brands = Array.from(new Set(carsInventory.map(car => car.brand)));
-  const categories = Array.from(new Set(carsInventory.map(car => car.category)));
-  
-  const handleReset = () => {
-    setFilters({
-      search: "",
-      brand: "",
-      category: "",
-      minPrice: 0,
-      maxPrice: 300000,
-    });
-  };
-  
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       
-      <main>
-        {/* Hero Section */}
-        <section 
-          className="relative h-[40vh] flex items-center justify-center bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1489824904134-891ab64532f1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=80')" }}
-        >
-          <div className="absolute inset-0 bg-background/70"></div>
-          <div className="relative z-10 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Nos Voitures</h1>
-            <p className="text-lg text-white/90 max-w-2xl mx-auto">
-              Explorez notre collection exclusive de véhicules de luxe et trouvez la voiture de vos rêves.
-            </p>
+      <main className="flex-grow">
+        {/* Minimalist Hero/Header */}
+        <section className="py-8 px-6 md:py-12 md:px-12 lg:px-24">
+          <div className="max-w-screen-xl mx-auto">
+            <h1 data-scroll="reveal" className="ujet-heading font-light text-4xl md:text-6xl mb-4">
+              Notre Collection
+            </h1>
+            <div className="ujet-divider"></div>
           </div>
         </section>
         
-        {/* Filters and Cars */}
-        <section className="section-padding">
-          <div className="container mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              {/* Filters Sidebar */}
-              <div className="lg:col-span-1">
-                <div className="glass-card p-6 rounded-lg sticky top-24">
-                  <h2 className="text-xl font-medium mb-6">Filtres</h2>
-                  
-                  {/* Search */}
-                  <div className="mb-6">
-                    <p className="text-sm font-medium mb-2">Recherche</p>
-                    <Input
-                      type="text"
-                      placeholder="Rechercher..."
-                      value={filters.search}
-                      onChange={(e) => setFilters({...filters, search: e.target.value})}
-                      className="bg-muted"
-                    />
-                  </div>
-                  
-                  {/* Brand Filter */}
-                  <div className="mb-6">
-                    <p className="text-sm font-medium mb-2">Marque</p>
-                    <Select
-                      value={filters.brand}
-                      onValueChange={(value) => setFilters({...filters, brand: value})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Toutes les marques" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Toutes les marques</SelectItem>
-                        {brands.map(brand => (
-                          <SelectItem key={brand} value={brand}>{brand}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  {/* Category Filter */}
-                  <div className="mb-6">
-                    <p className="text-sm font-medium mb-2">Catégorie</p>
-                    <Select
-                      value={filters.category}
-                      onValueChange={(value) => setFilters({...filters, category: value})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Toutes les catégories" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Toutes les catégories</SelectItem>
-                        {categories.map(category => (
-                          <SelectItem key={category} value={category}>{category}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  {/* Price Range Filter */}
-                  <div className="mb-8">
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="text-sm font-medium">Prix</p>
-                      <span className="text-xs text-muted-foreground">
-                        {filters.minPrice.toLocaleString()} € - {filters.maxPrice.toLocaleString()} €
-                      </span>
-                    </div>
-                    <Slider
-                      defaultValue={[filters.minPrice, filters.maxPrice]}
-                      min={0}
-                      max={300000}
-                      step={10000}
-                      minStepsBetweenThumbs={1}
-                      onValueChange={(value) => setFilters({
-                        ...filters, 
-                        minPrice: value[0], 
-                        maxPrice: value[1]
-                      })}
-                      className="my-6"
-                    />
-                  </div>
-                  
-                  {/* Reset Button */}
-                  <Button
-                    variant="outline"
-                    className="w-full border-primary text-primary hover:bg-primary hover:text-white"
-                    onClick={handleReset}
-                  >
-                    Réinitialiser les filtres
-                  </Button>
-                </div>
-              </div>
-              
-              {/* Cars Grid */}
-              <div className="lg:col-span-3">
-                <div className="flex justify-between items-center mb-8">
-                  <p className="text-muted-foreground">
-                    {cars.length} véhicules trouvés
-                  </p>
-                  <Select defaultValue="newest">
-                    <SelectTrigger className="w-48">
-                      <SelectValue placeholder="Trier par" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="newest">Plus récent</SelectItem>
-                      <SelectItem value="oldest">Plus ancien</SelectItem>
-                      <SelectItem value="price-asc">Prix (croissant)</SelectItem>
-                      <SelectItem value="price-desc">Prix (décroissant)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {cars.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {cars.map((car, index) => (
-                      <div 
-                        key={car.id} 
-                        className="animate-fade-in opacity-0" 
-                        style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+        {/* Main Vehicle Display - Clean Split Layout */}
+        <section className="w-full min-h-[80vh]">
+          <div className="grid grid-cols-1 md:grid-cols-2 h-full">
+            {/* Left Column: Vehicle List */}
+            <div className="bg-white p-6 md:p-12 lg:p-24 h-full overflow-y-auto">
+              {carsInventory.map((car, index) => (
+                <div 
+                  key={car.id}
+                  className={`border-b border-gray-100 py-8 cursor-pointer transition-all duration-500 ${car.id === activeCar.id ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}
+                  onClick={() => setActiveCar(car)}
+                  data-scroll="fade-right"
+                  style={{ '--scroll-delay': index * 2 } as React.CSSProperties}
+                >
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500 mb-1">{car.category}</span>
+                    <h2 className={`text-2xl md:text-3xl mb-2 transition-all ${car.id === activeCar.id ? 'font-medium' : 'font-light'}`}>
+                      {car.name}
+                    </h2>
+                    <div className="flex items-center justify-between">
+                      <span className="font-light">{car.year}</span>
+                      <Button
+                        variant="ghost"
+                        className={`p-0 h-auto ${car.id === activeCar.id ? 'opacity-100' : 'opacity-0'}`}
+                        asChild
                       >
-                        <CarCard car={car} />
-                      </div>
-                    ))}
+                        <Link to={`/vehicles/${car.id}`} className="text-underline">
+                          Explore <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-center py-16">
-                    <h3 className="text-xl font-medium mb-2">Aucun véhicule trouvé</h3>
-                    <p className="text-muted-foreground mb-6">
-                      Essayez de modifier vos critères de recherche
-                    </p>
-                    <Button onClick={handleReset}>
-                      Réinitialiser les filtres
-                    </Button>
-                  </div>
-                )}
+                </div>
+              ))}
+            </div>
+            
+            {/* Right Column: Selected Vehicle Image */}
+            <div className="h-full bg-gray-100 relative overflow-hidden">
+              <div 
+                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+                style={{
+                  backgroundImage: `url(${activeCar.image})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              ></div>
+              <div className="absolute bottom-0 left-0 p-6 md:p-12 bg-white/80 backdrop-blur-sm max-w-md">
+                <p className="text-lg md:text-xl font-light mb-2">{activeCar.price} €</p>
+                <Link 
+                  to={`/vehicles/${activeCar.id}`}
+                  className="text-underline text-sm flex items-center group"
+                >
+                  Voir les détails
+                  <ArrowRight className="ml-2 h-4 w-4 transform transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        {/* Call to Action */}
+        <section className="py-16 px-6 md:py-24 md:px-12 lg:px-24 bg-black text-white">
+          <div className="max-w-screen-xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+              <div data-scroll="fade-right">
+                <h2 className="ujet-heading text-3xl md:text-4xl lg:text-5xl mb-6">
+                  Découvrez notre collection exclusive
+                </h2>
+                <p className="text-white/70 mb-8 max-w-lg">
+                  Nous proposons une sélection de voitures de luxe pour tous les goûts et tous les budgets.
+                </p>
+              </div>
+              <div className="flex justify-start md:justify-end" data-scroll="fade-left">
+                <Button
+                  className="rounded-full bg-white text-black px-8 py-6 text-sm uppercase tracking-wider hover:bg-gray-200"
+                  asChild
+                >
+                  <Link to="/contact">Contactez-nous</Link>
+                </Button>
               </div>
             </div>
           </div>
