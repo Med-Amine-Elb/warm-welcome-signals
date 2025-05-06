@@ -1,251 +1,234 @@
+
 import { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import AboutSection from '@/components/AboutSection';
-import { Card } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
+import { ArrowDown } from 'lucide-react';
 
+// Updated timeline content to match the luxury car theme
 const timeline = [
   {
     year: "2005",
     title: "Création de DriveLuxe",
-    description: "Fondation de DriveLuxe à Paris avec une collection initiale de 15 véhicules de luxe."
-  },
-  {
-    year: "2008",
-    title: "Expansion du showroom",
-    description: "Agrandissement de notre espace d'exposition pour accueillir plus de 50 véhicules."
+    description: "Fondation de DriveLuxe à Paris avec une collection initiale de véhicules de luxe."
   },
   {
     year: "2012",
-    title: "Lancement du service technique",
-    description: "Ouverture de notre atelier spécialisé pour l'entretien et la personnalisation de véhicules haut de gamme."
-  },
-  {
-    year: "2015",
-    title: "Certification Excellence",
-    description: "Obtention de la certification 'Excellence Automobile' pour la qualité de nos services."
+    title: "Expansion Nationale",
+    description: "Ouverture de nouvelles concessions sur la Côte d'Azur et à Lyon."
   },
   {
     year: "2018",
-    title: "Développement national",
-    description: "Ouverture de nouvelles concessions à Lyon et sur la Côte d'Azur."
-  },
-  {
-    year: "2023",
-    title: "Innovation digitale",
-    description: "Lancement de notre plateforme en ligne pour une expérience client améliorée et personnalisée."
+    title: "Innovation Digitale",
+    description: "Lancement de notre plateforme en ligne pour une expérience client personnalisée."
   }
 ];
 
-// Updated team with only one person
-const team = [
-  {
-    name: "Alexandre Dupont",
-    role: "Fondateur & Développeur",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8YnVzaW5lc3MlMjBtYW58ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60",
-    description: "Passionné de technologie et d'automobile depuis toujours, j'ai créé DriveLuxe pour offrir une expérience client exceptionnelle dans le monde des voitures de luxe. Je suis le seul créateur et développeur derrière cette plateforme."
-  }
-];
-
-const values = [
-  {
-    title: "Excellence",
-    description: "Nous visons l'excellence dans tous les aspects de notre activité, de la sélection des véhicules au service après-vente."
-  },
-  {
-    title: "Passion",
-    description: "Notre équipe partage une passion authentique pour l'automobile qui se reflète dans chaque interaction avec nos clients."
-  },
-  {
-    title: "Intégrité",
-    description: "Nous privilégions l'honnêteté et la transparence dans toutes nos relations commerciales."
-  },
-  {
-    title: "Innovation",
-    description: "Nous recherchons constamment de nouvelles façons d'améliorer l'expérience de nos clients et de rester à la pointe du secteur."
-  }
-];
+// Team member
+const founder = {
+  name: "Alexandre Dupont",
+  role: "Fondateur & Directeur",
+  image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8YnVzaW5lc3MlMjBtYW58ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60",
+};
 
 const About = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Parallax scroll effect for background elements
+    const handleScroll = () => {
+      const scrollValue = window.scrollY;
+      const bgElements = document.querySelectorAll('.parallax-bg');
+      
+      bgElements.forEach((el) => {
+        const element = el as HTMLElement;
+        const speed = Number(element.dataset.speed) || 0.5;
+        element.style.transform = `translateY(${scrollValue * speed}px)`;
+      });
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#1A1F2C] text-white overflow-hidden">
       <Navbar />
       
       <main>
-        {/* Hero Section */}
-        <section 
-          className="relative h-[40vh] flex items-center justify-center bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=80')" }}
-        >
-          <div className="absolute inset-0 bg-background/70"></div>
-          <div className="relative z-10 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">À Propos de Nous</h1>
-            <p className="text-lg text-white/90 max-w-2xl mx-auto">
-              Découvrez l'histoire et les valeurs qui font de DriveLuxe votre concession automobile de confiance.
-            </p>
-          </div>
-        </section>
-        
-        {/* About Section */}
-        <AboutSection isHomePage={false} />
-        
-        {/* Values Section */}
-        <section className="section-padding bg-card">
-          <div className="container mx-auto">
-            <div className="text-center mb-16 animate-fade-in">
-              <h2 className="text-3xl font-bold mb-4">Nos Valeurs</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Des principes fondamentaux qui guident chaque aspect de notre entreprise.
-              </p>
+        {/* Hero Section - Full-height split design like UJET */}
+        <section className="h-screen relative flex flex-col">
+          <div className="absolute inset-0 grid grid-cols-1 md:grid-cols-2">
+            {/* Left side - Dark with text */}
+            <div className="flex flex-col justify-center px-8 md:px-16 lg:px-24 z-10">
+              <div className="space-y-6">
+                <span className="text-sm uppercase tracking-wider text-gray-400" data-scroll="fade-right">
+                  À PROPOS
+                </span>
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight" data-scroll="fade-right">
+                  Notre <br/> Histoire
+                </h1>
+                <p className="text-xl text-gray-300 max-w-md" data-scroll="fade-right" data-delay="200">
+                  Découvrez l'engagement de DriveLuxe envers l'excellence automobile depuis 2005.
+                </p>
+              </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {values.map((value, index) => (
-                <Card 
-                  key={index}
-                  className="glass-card p-6 hover-scale text-center"
-                >
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-primary">{index + 1}</span>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3">{value.title}</h3>
-                  <p className="text-muted-foreground">{value.description}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-        
-        {/* Timeline */}
-        <section className="section-padding">
-          <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">Notre Histoire</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Le parcours de DriveLuxe, de ses débuts modestes à sa position actuelle de leader.
-              </p>
-            </div>
-            
-            <div className="space-y-12 relative">
-              {/* Vertical Line */}
-              <div className="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-border -ml-px hidden md:block"></div>
-              
-              {timeline.map((item, index) => (
-                <div 
-                  key={index} 
-                  className={`relative flex flex-col md:flex-row md:items-center ${
-                    index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
-                  }`}
-                >
-                  {/* Timeline Dot */}
-                  <div className="absolute left-0 md:left-1/2 w-4 h-4 rounded-full bg-accent -ml-2 hidden md:block"></div>
-                  
-                  {/* Year */}
-                  <div className={`md:w-1/2 mb-4 md:mb-0 ${
-                    index % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12'
-                  }`}>
-                    <span className="text-3xl font-bold text-gradient">{item.year}</span>
-                  </div>
-                  
-                  {/* Content */}
-                  <div className={`md:w-1/2 glass-card p-6 ${
-                    index % 2 === 0 ? 'md:pl-12' : 'md:pr-12'
-                  }`}>
-                    <h3 className="text-xl font-medium mb-2">{item.title}</h3>
-                    <p className="text-muted-foreground">{item.description}</p>
-                  </div>
+            {/* Right side - Image or Design Element */}
+            <div className="hidden md:flex items-center justify-center">
+              <div className="w-3/4 h-3/4 relative">
+                {/* Large letter styling like UJET's "E" */}
+                <div className="absolute inset-0 text-[#2A2F3C] text-[40rem] font-bold leading-none opacity-20 flex items-center justify-center z-0 parallax-bg" data-speed="0.2">
+                  D
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        
-        {/* Team Section - Updated to show only one person */}
-        <section className="section-padding bg-card">
-          <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">L'Équipe</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Découvrez le créateur derrière DriveLuxe.
-              </p>
-            </div>
-            
-            <div className="max-w-md mx-auto">
-              <div className="animate-fade-in opacity-0" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
-                <Card className="glass-card overflow-hidden hover-scale">
-                  <div className="aspect-w-1 aspect-h-1">
-                    <img 
-                      src={team[0].image} 
-                      alt={team[0].name} 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-6 text-center">
-                    <h3 className="text-2xl font-semibold mb-1">{team[0].name}</h3>
-                    <p className="text-primary font-medium text-md mb-4">{team[0].role}</p>
-                    <p className="text-muted-foreground">{team[0].description}</p>
-                  </div>
-                </Card>
+                
+                <div className="relative z-10 w-full h-full">
+                  <img 
+                    src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80"
+                    alt="DriveLuxe showroom" 
+                    className="w-full h-full object-cover"
+                    data-scroll="reveal"
+                  />
+                </div>
               </div>
             </div>
           </div>
+          
+          {/* Scroll indicator */}
+          <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+            <span className="text-xs uppercase tracking-wider mb-2 text-gray-400">Scroll</span>
+            <ArrowDown className="w-5 h-5 animate-bounce-slow" />
+          </div>
         </section>
         
-        {/* Testimonial Section */}
-        <section className="section-padding">
-          <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">Ce Que Nos Clients Disent</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Découvrez les expériences de ceux qui nous ont fait confiance.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="glass-card p-8 relative">
-                <div className="text-4xl text-primary opacity-30 absolute top-4 left-4">"</div>
-                <p className="text-muted-foreground mb-6 relative z-10">
-                  J'ai acheté ma première Mercedes chez DriveLuxe et l'expérience a été exceptionnelle du début à la fin. L'équipe a pris le temps de comprendre mes besoins et m'a guidé vers le véhicule parfait pour moi.
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                    <img 
-                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHBvcnRyYWl0fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=100&q=60" 
-                      alt="Client" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-medium">Pierre Lemaire</h4>
-                    <p className="text-sm text-muted-foreground">Client depuis 2018</p>
-                  </div>
+        {/* Philosophy Section - Full width dark section */}
+        <section className="py-32 px-8 md:px-16 lg:px-24 bg-[#1A1F2C]">
+          <div className="max-w-screen-xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-12" data-scroll="fade-up">
+                  Notre philosophie
+                </h2>
+                
+                <div className="space-y-8">
+                  <p className="text-xl text-gray-300" data-scroll="fade-up">
+                    Fondée en 2005, DriveLuxe s'est imposée comme la référence des concessions automobiles de luxe en France. Notre passion pour l'excellence automobile guide chacune de nos décisions.
+                  </p>
+                  <p className="text-xl text-gray-300" data-scroll="fade-up" data-delay="200">
+                    Chez DriveLuxe, nous ne vendons pas simplement des voitures, nous créons des expériences inoubliables pour les passionnés d'automobiles d'exception.
+                  </p>
                 </div>
               </div>
               
-              <div className="glass-card p-8 relative">
-                <div className="text-4xl text-primary opacity-30 absolute top-4 left-4">"</div>
-                <p className="text-muted-foreground mb-6 relative z-10">
-                  Le service après-vente de DriveLuxe est incomparable. J'ai eu un problème mineur avec ma Porsche et ils l'ont résolu immédiatement, en m'offrant même une voiture de courtoisie haut de gamme pendant la réparation.
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                    <img 
-                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cG9ydHJhaXR8ZW58MHx8MHx8&auto=format&fit=crop&w=100&q=60" 
-                      alt="Client" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-medium">Isabelle Moreau</h4>
-                    <p className="text-sm text-muted-foreground">Cliente depuis 2020</p>
-                  </div>
+              <div className="grid grid-cols-2 gap-8">
+                <div data-scroll="fade-up" data-delay="300">
+                  <p className="text-5xl font-bold text-white mb-2">15+</p>
+                  <p className="text-gray-400">Années d'expérience</p>
+                </div>
+                <div data-scroll="fade-up" data-delay="400">
+                  <p className="text-5xl font-bold text-white mb-2">500+</p>
+                  <p className="text-gray-400">Clients satisfaits</p>
+                </div>
+                <div data-scroll="fade-up" data-delay="500">
+                  <p className="text-5xl font-bold text-white mb-2">100+</p>
+                  <p className="text-gray-400">Véhicules en stock</p>
+                </div>
+                <div data-scroll="fade-up" data-delay="600">
+                  <p className="text-5xl font-bold text-white mb-2">24/7</p>
+                  <p className="text-gray-400">Support client</p>
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+        
+        {/* Timeline Section - UJET style with image */}
+        <section className="py-32 px-8 md:px-16 lg:px-24 bg-[#151A24]">
+          <div className="max-w-screen-xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+              {/* Image Column */}
+              <div className="order-2 md:order-1">
+                <div className="relative">
+                  <img
+                    src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=80"
+                    alt="Performance car"
+                    className="w-full object-cover"
+                    data-scroll="reveal"
+                  />
+                  <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-[#1A1F2C] z-10"></div>
+                </div>
+              </div>
+              
+              {/* Timeline Column */}
+              <div className="order-1 md:order-2">
+                <h2 className="text-3xl md:text-4xl font-bold mb-12" data-scroll="fade-up">
+                  Notre parcours
+                </h2>
+                
+                <div className="space-y-16">
+                  {timeline.map((item, index) => (
+                    <div key={index} className="relative" data-scroll="fade-up" data-delay={index * 200}>
+                      <div className="flex flex-col">
+                        <span className="text-5xl font-bold text-gray-800">{item.year}</span>
+                        <h3 className="text-2xl font-medium mt-2">{item.title}</h3>
+                        <p className="text-gray-400 mt-2">{item.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <Link to="/vehicles" className="inline-block mt-12 py-4 px-6 border border-white text-sm uppercase tracking-wider hover:bg-white hover:text-[#1A1F2C] transition-colors" data-scroll="fade-up">
+                  Découvrir nos véhicules
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        {/* Team Section - UJET style with full-width image */}
+        <section className="py-32 px-8 md:px-16 lg:px-24 bg-[#1A1F2C]">
+          <div className="max-w-screen-xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold mb-16" data-scroll="fade-up">
+              La Direction
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+              <div>
+                <div className="mb-8" data-scroll="fade-right">
+                  <h3 className="text-3xl font-medium">{founder.name}</h3>
+                  <p className="text-gray-400 mt-2">{founder.role}</p>
+                </div>
+                
+                <p className="text-xl text-gray-300" data-scroll="fade-right" data-delay="200">
+                  "Passionné par l'automobile de luxe depuis mon enfance, j'ai fondé DriveLuxe avec la vision de créer plus qu'une simple concession. Notre mission est de transformer l'achat d'un véhicule en une expérience mémorable, en alliant expertise technique, service impeccable et attention aux détails."
+                </p>
+              </div>
+              
+              <div className="relative" data-scroll="reveal">
+                <img 
+                  src={founder.image}
+                  alt={founder.name}
+                  className="w-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        {/* Call to Action - UJET style full-width section */}
+        <section className="py-32 px-8 md:px-16 lg:px-24 bg-[#151A24] text-center">
+          <div className="max-w-screen-xl mx-auto">
+            <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold mb-8" data-scroll="fade-up">
+              Prêt à découvrir <br/> l'excellence automobile?
+            </h2>
+            
+            <Link 
+              to="/vehicles"
+              className="inline-block mt-8 py-4 px-12 bg-white text-[#1A1F2C] text-sm uppercase tracking-wider hover:bg-opacity-90 transition-colors"
+              data-scroll="fade-up" data-delay="200"
+            >
+              Explorer notre collection
+            </Link>
           </div>
         </section>
       </main>

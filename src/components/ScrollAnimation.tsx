@@ -9,14 +9,20 @@ const ScrollAnimation = ({ children }: ScrollAnimationProps) => {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    // Initialize scroll animations with smoother transitions
+    // Enhanced scroll animations with more refined effects
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             entry.target.classList.add('animate-in');
+            
+            // Add transition delay based on data attribute
+            const delay = entry.target.getAttribute('data-delay');
+            if (delay) {
+              entry.target.style.transitionDelay = `${delay}ms`;
+            }
           } else {
-            // Optional: Remove animation class when element is not in view
+            // Optional: Remove animation class when element is not in view for reanimation
             // entry.target.classList.remove('animate-in');
           }
         });
