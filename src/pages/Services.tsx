@@ -6,6 +6,7 @@ import ServiceCard from '@/components/ServiceCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Car, Settings, Calendar, Search, Navigation, Phone } from 'lucide-react';
+import ScrollAnimation from '@/components/ScrollAnimation';
 
 // Services data
 const mainServices = [
@@ -70,22 +71,22 @@ const Services = () => {
       <main>
         {/* Hero Section */}
         <section 
-          className="relative h-[40vh] flex items-center justify-center bg-cover bg-center"
+          className="relative h-[50vh] md:h-[60vh] flex items-center justify-center bg-cover bg-center"
           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1632752893012-6b22e8467e38?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2FyJTIwc2VydmljZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=1920&q=80')" }}
         >
-          <div className="absolute inset-0 bg-background/70"></div>
-          <div className="relative z-10 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Nos Services</h1>
-            <p className="text-lg text-white/90 max-w-2xl mx-auto">
+          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="relative z-10 text-center" data-scroll="fade-up">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">Nos Services</h1>
+            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
               Des solutions premium pour répondre à tous vos besoins automobiles.
             </p>
           </div>
         </section>
         
         {/* Main Services */}
-        <section className="section-padding">
+        <section className="section-padding bg-gradient-to-b from-background to-secondary/10">
           <div className="container mx-auto">
-            <div className="text-center mb-16 animate-fade-in">
+            <div className="text-center mb-16" data-scroll="fade-up">
               <h2 className="text-3xl font-bold mb-4">Services Premium</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Découvrez notre gamme complète de services conçus pour vous offrir une expérience automobile d'exception.
@@ -96,8 +97,8 @@ const Services = () => {
               {mainServices.map((service, index) => (
                 <div 
                   key={index}
-                  className="animate-fade-in opacity-0"
-                  style={{ animationDelay: `${index * 200}ms`, animationFillMode: 'forwards' }}
+                  data-scroll="fade-up"
+                  data-delay={index * 2}
                 >
                   <ServiceCard 
                     icon={service.icon}
@@ -114,18 +115,20 @@ const Services = () => {
         {/* Additional Services */}
         <section className="section-padding bg-card">
           <div className="container mx-auto">
-            <div className="text-center mb-16">
+            <div className="text-center mb-16" data-scroll="fade-up">
               <h2 className="text-3xl font-bold mb-4">Services Complémentaires</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Pour une expérience encore plus complète, nous vous proposons également ces services sur mesure.
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-animation">
               {additionalServices.map((service, index) => (
                 <Card 
                   key={index} 
                   className="glass-card p-6 hover-scale"
+                  data-scroll="zoom-in"
+                  data-delay={index}
                 >
                   <h3 className="text-xl font-medium mb-3">{service.title}</h3>
                   <p className="text-muted-foreground">{service.description}</p>
@@ -136,9 +139,9 @@ const Services = () => {
         </section>
         
         {/* Service Process */}
-        <section className="section-padding">
+        <section className="section-padding bg-gradient-to-b from-secondary/10 to-background">
           <div className="container mx-auto">
-            <div className="text-center mb-16">
+            <div className="text-center mb-16" data-scroll="fade-up">
               <h2 className="text-3xl font-bold mb-4">Notre Processus de Service</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Un service d'excellence en toute transparence, du premier contact à la livraison.
@@ -146,7 +149,7 @@ const Services = () => {
             </div>
             
             <div className="flex flex-col md:flex-row gap-8 mb-8">
-              <div className="flex-1 relative">
+              <div className="flex-1 relative" data-scroll="fade-right" data-delay="0">
                 <div className="glass-card p-6 h-full">
                   <div className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold text-white">1</div>
                   <h3 className="text-xl font-medium mb-3 mt-4">Consultation</h3>
@@ -156,7 +159,7 @@ const Services = () => {
                 </div>
               </div>
               
-              <div className="flex-1 relative">
+              <div className="flex-1 relative" data-scroll="fade-right" data-delay="2">
                 <div className="glass-card p-6 h-full">
                   <div className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold text-white">2</div>
                   <h3 className="text-xl font-medium mb-3 mt-4">Essai Personnalisé</h3>
@@ -166,7 +169,7 @@ const Services = () => {
                 </div>
               </div>
               
-              <div className="flex-1 relative">
+              <div className="flex-1 relative" data-scroll="fade-right" data-delay="4">
                 <div className="glass-card p-6 h-full">
                   <div className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold text-white">3</div>
                   <h3 className="text-xl font-medium mb-3 mt-4">Personnalisation</h3>
@@ -178,7 +181,7 @@ const Services = () => {
             </div>
             
             <div className="flex flex-col md:flex-row gap-8">
-              <div className="flex-1 relative">
+              <div className="flex-1 relative" data-scroll="fade-left" data-delay="0">
                 <div className="glass-card p-6 h-full">
                   <div className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold text-white">4</div>
                   <h3 className="text-xl font-medium mb-3 mt-4">Financement</h3>
@@ -188,7 +191,7 @@ const Services = () => {
                 </div>
               </div>
               
-              <div className="flex-1 relative">
+              <div className="flex-1 relative" data-scroll="fade-left" data-delay="2">
                 <div className="glass-card p-6 h-full">
                   <div className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold text-white">5</div>
                   <h3 className="text-xl font-medium mb-3 mt-4">Préparation</h3>
@@ -198,7 +201,7 @@ const Services = () => {
                 </div>
               </div>
               
-              <div className="flex-1 relative">
+              <div className="flex-1 relative" data-scroll="fade-left" data-delay="4">
                 <div className="glass-card p-6 h-full">
                   <div className="absolute -top-4 -left-4 w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold text-white">6</div>
                   <h3 className="text-xl font-medium mb-3 mt-4">Livraison</h3>
@@ -214,7 +217,7 @@ const Services = () => {
         {/* CTA Section */}
         <section className="bg-card py-16 px-4">
           <div className="container mx-auto">
-            <div className="glass-card p-8 md:p-12 rounded-lg">
+            <div className="glass-card p-8 md:p-12 rounded-lg" data-scroll="zoom-in">
               <div className="flex flex-col md:flex-row items-center justify-between">
                 <div className="md:w-2/3 mb-6 md:mb-0">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">Besoin d'assistance ou d'informations?</h2>
@@ -223,7 +226,7 @@ const Services = () => {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button className="bg-accent hover:bg-accent/80 text-white flex items-center gap-2">
+                  <Button className="bg-primary hover:bg-primary/80 text-white flex items-center gap-2">
                     <Phone className="w-4 h-4" />
                     <span>Nous appeler</span>
                   </Button>

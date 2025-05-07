@@ -23,7 +23,7 @@ const ScrollAnimation = ({ children }: ScrollAnimationProps) => {
               const delay = entry.target.getAttribute('data-delay');
               if (delay) {
                 // Cast the target to HTMLElement to access style property
-                (entry.target as HTMLElement).style.transitionDelay = `${delay}ms`;
+                (entry.target as HTMLElement).style.transitionDelay = `${delay}00ms`;
               }
             } else {
               // Optional: Remove animation class when element leaves viewport
@@ -58,9 +58,9 @@ const ScrollAnimation = ({ children }: ScrollAnimationProps) => {
             el.classList.add('animate-in');
           }
         });
-      }, 100);
+      }, 300);
       
-    }, 100);
+    }, 200);
     
     return () => {
       if (observerRef.current) {
