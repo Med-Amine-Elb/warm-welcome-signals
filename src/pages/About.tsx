@@ -1,9 +1,10 @@
 
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { ArrowDown } from 'lucide-react';
+import AboutSection from '@/components/AboutSection';
 
 // Updated timeline content to match the luxury car theme
 const timeline = [
@@ -32,23 +33,51 @@ const founder = {
 };
 
 const About = () => {
+  // Pre-load critical images
+  useLayoutEffect(() => {
+    const preloadImages = [
+      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=80",
+      founder.image
+    ];
+    
+    preloadImages.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    // Parallax scroll effect for background elements
-    const handleScroll = () => {
-      const scrollValue = window.scrollY;
-      const bgElements = document.querySelectorAll('.parallax-bg');
+    // Add small timeout to allow DOM to be fully rendered before applying animations
+    const timeout = setTimeout(() => {
+      // Parallax scroll effect for background elements
+      const handleScroll = () => {
+        const scrollValue = window.scrollY;
+        const bgElements = document.querySelectorAll('.parallax-bg');
+        
+        bgElements.forEach((el) => {
+          const element = el as HTMLElement;
+          const speed = Number(element.dataset.speed) || 0.5;
+          element.style.transform = `translateY(${scrollValue * speed}px)`;
+        });
+      };
       
-      bgElements.forEach((el) => {
-        const element = el as HTMLElement;
-        const speed = Number(element.dataset.speed) || 0.5;
-        element.style.transform = `translateY(${scrollValue * speed}px)`;
+      window.addEventListener('scroll', handleScroll);
+      
+      // Apply initial animations
+      document.querySelectorAll('[data-scroll]').forEach(el => {
+        el.classList.add('animate-in');
       });
-    };
+      
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        clearTimeout(timeout);
+      };
+    }, 100);
     
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
@@ -56,7 +85,7 @@ const About = () => {
       <Navbar />
       
       <main>
-        {/* Hero Section - Full-height split design like UJET */}
+        {/* Hero Section - Full-height split design */}
         <section className="h-screen relative flex flex-col">
           <div className="absolute inset-0 grid grid-cols-1 md:grid-cols-2">
             {/* Left side - Dark with text */}
@@ -77,7 +106,7 @@ const About = () => {
             {/* Right side - Image or Design Element */}
             <div className="hidden md:flex items-center justify-center">
               <div className="w-3/4 h-3/4 relative">
-                {/* Large letter styling like UJET's "E" */}
+                {/* Large letter styling */}
                 <div className="absolute inset-0 text-[#2A2F3C] text-[40rem] font-bold leading-none opacity-20 flex items-center justify-center z-0 parallax-bg" data-speed="0.2">
                   D
                 </div>
@@ -87,7 +116,7 @@ const About = () => {
                     src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80"
                     alt="DriveLuxe showroom" 
                     className="w-full h-full object-cover"
-                    data-scroll="reveal"
+                    loading="eager"
                   />
                 </div>
               </div>
@@ -142,7 +171,7 @@ const About = () => {
           </div>
         </section>
         
-        {/* Timeline Section - UJET style with image */}
+        {/* Timeline Section with image */}
         <section className="py-32 px-8 md:px-16 lg:px-24 bg-[#151A24]">
           <div className="max-w-screen-xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
@@ -154,6 +183,7 @@ const About = () => {
                     alt="Performance car"
                     className="w-full object-cover"
                     data-scroll="reveal"
+                    loading="eager"
                   />
                   <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-[#1A1F2C] z-10"></div>
                 </div>
@@ -185,7 +215,7 @@ const About = () => {
           </div>
         </section>
         
-        {/* Team Section - UJET style with full-width image */}
+        {/* Team Section - with full-width image */}
         <section className="py-32 px-8 md:px-16 lg:px-24 bg-[#1A1F2C]">
           <div className="max-w-screen-xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-bold mb-16" data-scroll="fade-up">
@@ -209,13 +239,14 @@ const About = () => {
                   src={founder.image}
                   alt={founder.name}
                   className="w-full object-cover"
+                  loading="eager"
                 />
               </div>
             </div>
           </div>
         </section>
         
-        {/* Call to Action - UJET style full-width section */}
+        {/* Call to Action - full-width section */}
         <section className="py-32 px-8 md:px-16 lg:px-24 bg-[#151A24] text-center">
           <div className="max-w-screen-xl mx-auto">
             <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold mb-8" data-scroll="fade-up">

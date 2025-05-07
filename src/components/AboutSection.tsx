@@ -49,6 +49,7 @@ const AboutSection = ({ isHomePage = true }: AboutSectionProps) => {
                 src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80"
                 alt="Showroom de voitures de luxe"
                 className="w-full h-full object-cover"
+                loading="eager"
               />
             </div>
             <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary rounded-lg z-0 hidden md:block" />
@@ -94,7 +95,7 @@ const AboutSection = ({ isHomePage = true }: AboutSectionProps) => {
             {isHomePage && (
               <div className="pt-4 animate-item opacity-0" style={{ animationDelay: '600ms' }}>
                 <Link to="/about">
-                  <Button variant="default" className="bg-primary hover:bg-primary/80">
+                  <Button variant="default" className="bg-primary hover:bg-primary/80 text-white">
                     En savoir plus
                   </Button>
                 </Link>
