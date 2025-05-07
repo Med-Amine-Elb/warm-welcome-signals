@@ -128,7 +128,7 @@ const Index = () => {
                   <p className="text-gray-600 mb-10">
                     Chez DriveLuxe, nous ne vendons pas simplement des voitures, nous offrons une expérience complète, de la recherche du véhicule idéal à l'entretien régulier, en passant par des services personnalisés qui font notre réputation.
                   </p>
-                  <Link to="/about" className="btn-ujet">
+                  <Link to="/about" className="inline-block bg-black text-white px-8 py-3 font-medium tracking-wider uppercase hover:bg-black/80 transition-colors">
                     En savoir plus
                   </Link>
                 </div>

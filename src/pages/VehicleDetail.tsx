@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -10,6 +11,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb";
 
 // Car inventory data
 const carsInventory = [
@@ -382,23 +391,31 @@ const VehicleDetail = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-grow">
-        {/* Breadcrumb */}
-        <div className="bg-muted py-4">
-          <div className="container mx-auto">
-            <div className="text-sm text-muted-foreground">
-              <Link to="/" className="hover:text-primary">Accueil</Link>
-              {' / '}
-              <Link to="/vehicles" className="hover:text-primary">Véhicules</Link>
-              {' / '}
-              <span className="text-foreground">{car.name}</span>
-            </div>
-          </div>
+      {/* Breadcrumb Navigation - Now positioned right after Navbar */}
+      <div className="bg-muted py-4">
+        <div className="container mx-auto px-6">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink as={Link} to="/">Accueil</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink as={Link} to="/vehicles">Véhicules</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{car.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
-        
+      </div>
+      
+      <main className="flex-grow">
         {/* Car Details */}
-        <section className="section-padding">
-          <div className="container mx-auto">
+        <section className="section-padding py-16">
+          <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               {/* Car Gallery */}
               <div className="relative glass-card p-2 rounded-lg">
@@ -530,7 +547,7 @@ const VehicleDetail = () => {
                 
                 <div className="pt-4 space-y-4">
                   <Button 
-                    className="w-full bg-accent hover:bg-accent/80 text-white"
+                    className="w-full bg-black hover:bg-black/80 text-white"
                     onClick={() => setShowTestDriveDialog(true)}
                   >
                     Réserver un essai
@@ -580,7 +597,7 @@ const VehicleDetail = () => {
                     .slice(0, 3)
                     .map((relatedCar) => (
                       <div key={relatedCar.id} className="glass-card overflow-hidden rounded-lg hover-scale">
-                        <Link to={`/vehicle/${relatedCar.id}`}>
+                        <Link to={`/vehicles/${relatedCar.id}`}>
                           <div className="aspect-w-16 aspect-h-9">
                             <img 
                               src={relatedCar.image} 
@@ -632,7 +649,7 @@ const VehicleDetail = () => {
               Complétez le formulaire ci-dessous pour réserver un essai de {car?.name}.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleTestDriveSubmit}>
+          <form onSubmit={handleTestDriveSubmit} className="space-y-4">
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Nom complet</Label>
@@ -704,7 +721,7 @@ const VehicleDetail = () => {
               Complétez le formulaire ci-dessous pour recevoir plus d'informations sur {car?.name}.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleInfoSubmit}>
+          <form onSubmit={handleInfoSubmit} className="space-y-4">
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Nom complet</Label>
@@ -766,7 +783,7 @@ const VehicleDetail = () => {
               Complétez le formulaire ci-dessous pour recevoir des options de financement pour {car?.name} à {car?.price} €.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleFinanceSubmit}>
+          <form onSubmit={handleFinanceSubmit} className="space-y-4">
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Nom complet</Label>

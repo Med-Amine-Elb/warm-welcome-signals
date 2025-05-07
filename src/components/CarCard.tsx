@@ -61,7 +61,7 @@ const CarCard = ({ car }: CarCardProps) => {
         </div>
         
         <div className="grid grid-cols-2 gap-4 mt-5">
-          <Link to={`/vehicle/${car.id}`} className="w-full">
+          <Link to={`/vehicles/${car.id}`} className="w-full">
             <Button 
               variant="outline" 
               className="text-sm border-primary text-primary hover:bg-primary hover:text-white w-full"
