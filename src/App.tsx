@@ -5,6 +5,7 @@ import About from './pages/About';
 import Services from './pages/Services';
 import Vehicles from './pages/Vehicles';
 import VehicleDetail from './pages/VehicleDetail';
+import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
 import ScrollAnimation from './components/ScrollAnimation';
 import './App.css';
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
   {
     path: '/vehicles/:id',
     element: <VehicleDetail />
+  },
+  {
+    path: '/contact',
+    element: <Contact />
   },
   {
     path: '*',
