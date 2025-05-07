@@ -1,5 +1,5 @@
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -10,31 +10,6 @@ interface AboutSectionProps {
 const AboutSection = ({ isHomePage = true }: AboutSectionProps) => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in');
-            entry.target.classList.remove('opacity-0');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    const childElements = sectionRef.current?.querySelectorAll('.animate-item');
-    childElements?.forEach((el) => {
-      observer.observe(el);
-    });
-
-    return () => {
-      childElements?.forEach((el) => {
-        observer.unobserve(el);
-      });
-    };
-  }, []);
-
   return (
     <section 
       className={`section-padding ${isHomePage ? 'bg-card' : 'bg-background'}`} 
@@ -43,7 +18,7 @@ const AboutSection = ({ isHomePage = true }: AboutSectionProps) => {
       <div className="container mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Image */}
-          <div className="relative animate-item opacity-0">
+          <div className="relative" data-scroll="fade-up">
             <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg">
               <img
                 src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80"
@@ -57,14 +32,14 @@ const AboutSection = ({ isHomePage = true }: AboutSectionProps) => {
           
           {/* Content */}
           <div className="space-y-6">
-            <div className="animate-item opacity-0">
+            <div data-scroll="fade-up">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 {isHomePage ? 'À Propos de DriveLuxe' : 'Notre Histoire'}
               </h2>
               <div className="w-20 h-1 bg-accent mb-6" />
             </div>
             
-            <div className="space-y-4 animate-item opacity-0" style={{ animationDelay: '200ms' }}>
+            <div className="space-y-4" data-scroll="fade-up" data-delay="200">
               <p className="text-muted-foreground">
                 Fondée en 2005, DriveLuxe s'est imposée comme la référence des concessions automobiles de luxe en France. Notre passion pour l'excellence automobile nous a conduits à sélectionner rigoureusement les véhicules les plus prestigieux pour notre clientèle exigeante.
               </p>
@@ -73,7 +48,7 @@ const AboutSection = ({ isHomePage = true }: AboutSectionProps) => {
               </p>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 pt-4 animate-item opacity-0" style={{ animationDelay: '400ms' }}>
+            <div className="grid grid-cols-2 gap-4 pt-4" data-scroll="fade-up" data-delay="400">
               <div>
                 <p className="text-3xl font-bold text-primary">15+</p>
                 <p className="text-muted-foreground">Années d'expérience</p>
@@ -93,7 +68,7 @@ const AboutSection = ({ isHomePage = true }: AboutSectionProps) => {
             </div>
             
             {isHomePage && (
-              <div className="pt-4 animate-item opacity-0" style={{ animationDelay: '600ms' }}>
+              <div className="pt-4" data-scroll="fade-up" data-delay="600">
                 <Link to="/about">
                   <Button variant="default" className="bg-primary hover:bg-primary/80 text-white">
                     En savoir plus

@@ -1,11 +1,15 @@
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  
+  // Check if we're on the About page
+  const isAboutPage = location.pathname === '/about';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,36 +29,61 @@ const Navbar = () => {
   return (
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white py-4' : 'bg-transparent py-8'
+        isScrolled 
+          ? 'bg-white py-4 shadow-md' 
+          : `bg-transparent py-8 ${isAboutPage ? 'text-white' : ''}`
       }`}
     >
       <div className="container mx-auto px-6 md:px-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center">
+        <Link to="/" className={`flex items-center ${isScrolled || !isAboutPage ? 'text-black' : 'text-white'}`}>
           <span className="text-3xl font-bold tracking-tight">DriveLuxe</span>
         </Link>
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-12">
-          <Link to="/" className="text-sm font-medium uppercase tracking-wider hover:text-black/70 transition-colors">
+          <Link 
+            to="/" 
+            className={`text-sm font-medium uppercase tracking-wider hover:opacity-70 transition-colors ${
+              isScrolled || !isAboutPage ? 'text-black' : 'text-white'
+            }`}
+          >
             Accueil
           </Link>
-          <Link to="/vehicles" className="text-sm font-medium uppercase tracking-wider hover:text-black/70 transition-colors">
+          <Link 
+            to="/vehicles" 
+            className={`text-sm font-medium uppercase tracking-wider hover:opacity-70 transition-colors ${
+              isScrolled || !isAboutPage ? 'text-black' : 'text-white'
+            }`}
+          >
             Voitures
           </Link>
-          <Link to="/services" className="text-sm font-medium uppercase tracking-wider hover:text-black/70 transition-colors">
+          <Link 
+            to="/services" 
+            className={`text-sm font-medium uppercase tracking-wider hover:opacity-70 transition-colors ${
+              isScrolled || !isAboutPage ? 'text-black' : 'text-white'
+            }`}
+          >
             Services
           </Link>
-          <Link to="/about" className="text-sm font-medium uppercase tracking-wider hover:text-black/70 transition-colors">
+          <Link 
+            to="/about" 
+            className={`text-sm font-medium uppercase tracking-wider hover:opacity-70 transition-colors ${
+              isScrolled || !isAboutPage ? 'text-black' : 'text-white'
+            }`}
+          >
             À Propos
           </Link>
-          <Link to="/contact" className="btn-ujet">
+          <Link 
+            to="/contact" 
+            className={`btn-ujet ${isScrolled || !isAboutPage ? 'bg-black text-white' : 'bg-white text-black'}`}
+          >
             Contact
           </Link>
         </nav>
 
         {/* Mobile Menu Button */}
         <button 
-          className="md:hidden"
+          className={`md:hidden ${isScrolled || !isAboutPage ? 'text-black' : 'text-white'}`}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           <Menu className="h-6 w-6" />
