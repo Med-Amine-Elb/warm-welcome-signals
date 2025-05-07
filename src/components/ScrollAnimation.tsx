@@ -19,7 +19,8 @@ const ScrollAnimation = ({ children }: ScrollAnimationProps) => {
             // Add transition delay based on data attribute
             const delay = entry.target.getAttribute('data-delay');
             if (delay) {
-              entry.target.style.transitionDelay = `${delay}ms`;
+              // Fix: Cast the target to HTMLElement to access style property
+              (entry.target as HTMLElement).style.transitionDelay = `${delay}ms`;
             }
           } else {
             // Optional: Remove animation class when element is not in view for reanimation
