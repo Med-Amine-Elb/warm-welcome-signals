@@ -28,21 +28,21 @@ const mainServices = [
 
 const MainServices = () => {
   return (
-    <section className="section-padding bg-gradient-to-b from-background to-secondary/10">
-      <div className="container mx-auto">
+    <section className="py-24 px-4 md:px-8 bg-gradient-to-b from-background to-secondary/10">
+      <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-16" data-scroll="fade-up">
-          <h2 className="text-3xl font-bold mb-4">Services Premium</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Services Premium</h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Découvrez notre gamme complète de services conçus pour vous offrir une expérience automobile d'exception.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {mainServices.map((service, index) => (
             <div 
               key={index}
               data-scroll="fade-up"
-              data-delay={index * 2}
+              style={{ transitionDelay: `${index * 200}ms` }}
             >
               <ServiceCard 
                 icon={service.icon}

@@ -19,22 +19,20 @@ const ScrollAnimation = ({ children }: ScrollAnimationProps) => {
               // Add animate-in class for entering viewport
               entry.target.classList.add('animate-in');
               
-              // Handle transition delay based on data attribute
-              const delay = entry.target.getAttribute('data-delay');
+              // Get transition delay from data attribute or inline style
+              const delay = entry.target.getAttribute('data-delay') || 
+                           (entry.target as HTMLElement).style.transitionDelay;
+                           
               if (delay) {
                 // Cast the target to HTMLElement to access style property
-                (entry.target as HTMLElement).style.transitionDelay = `${delay}00ms`;
+                (entry.target as HTMLElement).style.transitionDelay = delay;
               }
-            } else {
-              // Optional: Remove animation class when element leaves viewport
-              // Uncomment if you want elements to re-animate when they re-enter the viewport
-              // entry.target.classList.remove('animate-in');
             }
           });
         },
         { 
-          threshold: 0.1,  // Trigger when at least 10% of the element is visible
-          rootMargin: '0px 0px -10% 0px'  // Slightly adjust the detection area
+          threshold: 0.15,  // Trigger when at least 15% of the element is visible
+          rootMargin: '0px 0px -8% 0px'  // Slightly adjust the detection area
         }
       );
       
@@ -54,7 +52,7 @@ const ScrollAnimation = ({ children }: ScrollAnimationProps) => {
           const rect = el.getBoundingClientRect();
           const windowHeight = window.innerHeight || document.documentElement.clientHeight;
           
-          if (rect.top <= windowHeight * 0.9) {
+          if (rect.top <= windowHeight * 0.85) {
             el.classList.add('animate-in');
           }
         });

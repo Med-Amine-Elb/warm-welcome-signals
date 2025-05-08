@@ -7,6 +7,7 @@ import MainServices from '@/components/services/MainServices';
 import AdditionalServices from '@/components/services/AdditionalServices';
 import ServiceProcess from '@/components/services/ServiceProcess';
 import ServiceCTA from '@/components/services/ServiceCTA';
+import ScrollAnimation from '@/components/ScrollAnimation';
 
 const Services = () => {
   useEffect(() => {
@@ -18,11 +19,13 @@ const Services = () => {
       <Navbar />
       
       <main>
-        <ServiceHero />
-        <MainServices />
-        <AdditionalServices />
-        <ServiceProcess />
-        <ServiceCTA />
+        <ScrollAnimation>
+          <ServiceHero />
+          <MainServices />
+          <AdditionalServices />
+          <ServiceProcess />
+          <ServiceCTA />
+        </ScrollAnimation>
       </main>
       
       <Footer />
