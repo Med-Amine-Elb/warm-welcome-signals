@@ -12,13 +12,19 @@ import ScrollAnimation from '@/components/ScrollAnimation';
 const Services = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Optional: Add a class to the body for page-specific styling
+    document.body.classList.add('services-page');
+    return () => {
+      document.body.classList.remove('services-page');
+    };
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main>
+      <main className="flex-grow">
         <ScrollAnimation>
           <ServiceHero />
           <MainServices />

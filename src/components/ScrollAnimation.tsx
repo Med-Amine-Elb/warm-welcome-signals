@@ -27,12 +27,16 @@ const ScrollAnimation = ({ children }: ScrollAnimationProps) => {
                 // Cast the target to HTMLElement to access style property
                 (entry.target as HTMLElement).style.transitionDelay = delay;
               }
+            } else {
+              // Optional: remove the class when out of viewport for re-animation on scroll back
+              // Uncomment if you want elements to re-animate when scrolled back into view
+              // entry.target.classList.remove('animate-in');
             }
           });
         },
         { 
           threshold: 0.15,  // Trigger when at least 15% of the element is visible
-          rootMargin: '0px 0px -8% 0px'  // Slightly adjust the detection area
+          rootMargin: '0px 0px -10% 0px'  // Slightly adjust the detection area
         }
       );
       
