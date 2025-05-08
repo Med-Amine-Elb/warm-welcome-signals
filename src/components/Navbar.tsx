@@ -8,8 +8,10 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   
-  // Check if we're on the About page
+  // Check if we're on the About or Services page
   const isAboutPage = location.pathname === '/about';
+  const isServicesPage = location.pathname === '/services';
+  const useWhiteText = isAboutPage || isServicesPage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,11 +33,11 @@ const Navbar = () => {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
           ? 'bg-white py-4 shadow-md' 
-          : `bg-transparent py-8 ${isAboutPage ? 'text-white' : ''}`
+          : `bg-transparent py-8 ${useWhiteText ? 'text-white' : ''}`
       }`}
     >
       <div className="container mx-auto px-6 md:px-16 flex items-center justify-between">
-        <Link to="/" className={`flex items-center ${isScrolled || !isAboutPage ? 'text-black' : 'text-white'}`}>
+        <Link to="/" className={`flex items-center ${isScrolled || !useWhiteText ? 'text-black' : 'text-white'}`}>
           <span className="text-3xl font-bold tracking-tight">DriveLuxe</span>
         </Link>
         
@@ -44,7 +46,7 @@ const Navbar = () => {
           <Link 
             to="/" 
             className={`text-sm font-medium uppercase tracking-wider hover:opacity-70 transition-colors ${
-              isScrolled || !isAboutPage ? 'text-black' : 'text-white'
+              isScrolled || !useWhiteText ? 'text-black' : 'text-white'
             }`}
           >
             Accueil
@@ -52,7 +54,7 @@ const Navbar = () => {
           <Link 
             to="/vehicles" 
             className={`text-sm font-medium uppercase tracking-wider hover:opacity-70 transition-colors ${
-              isScrolled || !isAboutPage ? 'text-black' : 'text-white'
+              isScrolled || !useWhiteText ? 'text-black' : 'text-white'
             }`}
           >
             Voitures
@@ -60,7 +62,7 @@ const Navbar = () => {
           <Link 
             to="/services" 
             className={`text-sm font-medium uppercase tracking-wider hover:opacity-70 transition-colors ${
-              isScrolled || !isAboutPage ? 'text-black' : 'text-white'
+              isScrolled || !useWhiteText ? 'text-black' : 'text-white'
             }`}
           >
             Services
@@ -68,14 +70,14 @@ const Navbar = () => {
           <Link 
             to="/about" 
             className={`text-sm font-medium uppercase tracking-wider hover:opacity-70 transition-colors ${
-              isScrolled || !isAboutPage ? 'text-black' : 'text-white'
+              isScrolled || !useWhiteText ? 'text-black' : 'text-white'
             }`}
           >
             À Propos
           </Link>
           <Link 
             to="/contact" 
-            className={`btn-ujet ${isScrolled || !isAboutPage ? 'bg-black text-white' : 'bg-white text-black'}`}
+            className={`btn-ujet ${isScrolled || !useWhiteText ? 'bg-black text-white' : 'bg-white text-black'}`}
           >
             Contact
           </Link>
@@ -83,7 +85,7 @@ const Navbar = () => {
 
         {/* Mobile Menu Button */}
         <button 
-          className={`md:hidden ${isScrolled || !isAboutPage ? 'text-black' : 'text-white'}`}
+          className={`md:hidden ${isScrolled || !useWhiteText ? 'text-black' : 'text-white'}`}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           <Menu className="h-6 w-6" />
