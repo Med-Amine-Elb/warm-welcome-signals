@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -7,13 +6,10 @@ import MainServices from '@/components/services/MainServices';
 import AdditionalServices from '@/components/services/AdditionalServices';
 import ServiceProcess from '@/components/services/ServiceProcess';
 import ServiceCTA from '@/components/services/ServiceCTA';
-import ScrollAnimation from '@/components/ScrollAnimation';
 
 const Services = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
-    
-    // Optional: Add a class to the body for page-specific styling
     document.body.classList.add('services-page');
     return () => {
       document.body.classList.remove('services-page');
@@ -21,19 +17,15 @@ const Services = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#10131a] to-[#181c24]">
       <Navbar />
-      
       <main className="flex-grow">
-        <ScrollAnimation>
-          <ServiceHero />
-          <MainServices />
-          <AdditionalServices />
-          <ServiceProcess />
-          <ServiceCTA />
-        </ScrollAnimation>
+        <ServiceHero />
+        <MainServices />
+        <AdditionalServices />
+        <ServiceProcess />
+        <ServiceCTA />
       </main>
-      
       <Footer />
     </div>
   );

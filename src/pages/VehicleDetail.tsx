@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -389,9 +388,7 @@ const VehicleDetail = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
-      {/* Breadcrumb Navigation - Now positioned directly under Navbar with lighter background */}
-      <div className="bg-gray-100 py-3 border-b border-gray-200">
+      <div className="mt-[100px] bg-gray-100 py-3 border-b border-gray-200">
         <div className="container mx-auto px-6">
           <Breadcrumb>
             <BreadcrumbList>
