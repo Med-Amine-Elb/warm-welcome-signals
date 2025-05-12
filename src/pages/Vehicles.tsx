@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -46,6 +45,23 @@ const Vehicles = () => {
   const [activeCar, setActiveCar] = useState(carsInventory[0]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Filter state and helpers must be inside the component
+  const [priceOrder, setPriceOrder] = useState('asc');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [brandFilter, setBrandFilter] = useState('');
+
+  const uniqueCategories = Array.from(new Set(carsInventory.map(car => car.category)));
+  const uniqueBrands = Array.from(new Set((carsInventory).map(car => car.brand).filter(Boolean)));
+
+  const filteredCars = carsInventory
+    .filter(car => (categoryFilter ? car.category === categoryFilter : true))
+    .filter(car => (brandFilter ? car.brand === brandFilter : true))
+    .sort((a, b) => {
+      const priceA = parseInt(a.price.replace(/\s/g, ''));
+      const priceB = parseInt(b.price.replace(/\s/g, ''));
+      return priceOrder === 'asc' ? priceA - priceB : priceB - priceA;
+    });
+
   useEffect(() => {
     window.scrollTo(0, 0);
     const timer = setTimeout(() => {
@@ -61,12 +77,74 @@ const Vehicles = () => {
       
       <main className="flex-grow">
         {/* Minimalist Hero/Header */}
-        <section className="py-8 px-6 md:py-12 md:px-12 lg:px-24">
+        <section className="py-8 px-6 md:py-12 md:px-12 lg:px-24 mt-16 md:mt-24">
           <div className="max-w-screen-xl mx-auto">
-            <h1 data-scroll="reveal" className="ujet-heading font-light text-4xl md:text-6xl mb-4">
+            <h1 data-scroll="reveal" className="ujet-heading font-black text-4xl md:text-7xl mb-2 bg-gradient-to-r from-black via-gray-800 to-gray-500 bg-clip-text text-transparent animate-fade-in">
               Notre Collection
             </h1>
             <div className="ujet-divider"></div>
+            <p className="ujet-subheading text-lg md:text-2xl font-light text-gray-600 mb-2 animate-fade-in delay-200">
+              Découvrez l'élite de l'automobile de luxe
+            </p>
+            {/* Filter Bar */}
+            <div className="w-full flex justify-center mt-6 mb-8">
+              <div className="backdrop-blur-md bg-white/60 shadow-lg rounded-2xl px-6 py-4 max-w-2xl w-full border border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Price Filter */}
+                  <div className="flex flex-col items-center">
+                    <label className="flex justify-center items-center gap-2 text-center w-full text-xs font-extrabold mb-2 tracking-widest uppercase bg-gradient-to-r from-black via-gray-800 to-gray-500 bg-clip-text text-transparent">
+                      {/* Price icon */}
+                      <svg xmlns='http://www.w3.org/2000/svg' className='inline w-4 h-4 text-gray-500' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v8m0 0l-3-3m3 3l3-3' /></svg>
+                      Prix
+                    </label>
+                    <select
+                      className="appearance-none border-none rounded-full px-4 py-2 bg-white/80 text-black focus:outline-none focus:ring-2 focus:ring-black shadow-sm transition-all"
+                      value={priceOrder}
+                      onChange={e => setPriceOrder(e.target.value)}
+                    >
+                      <option value="asc">Croissant</option>
+                      <option value="desc">Décroissant</option>
+                    </select>
+                  </div>
+                  {/* Category Filter */}
+                  <div className="flex flex-col items-center">
+                    <label className="flex items-center gap-1 justify-center text-center w-full text-xs font-extrabold mb-2 tracking-widest uppercase bg-gradient-to-r from-black via-gray-800 to-gray-500 bg-clip-text text-transparent">
+                      {/* Category icon */}
+                      <svg xmlns='http://www.w3.org/2000/svg' className='inline w-4 h-4 text-gray-500' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16M4 18h16' /></svg>
+                      Catégorie
+                    </label>
+                    <select
+                      className="appearance-none border-none rounded-full px-4 py-2 bg-white/80 text-black focus:outline-none focus:ring-2 focus:ring-black shadow-sm transition-all"
+                      value={categoryFilter}
+                      onChange={e => setCategoryFilter(e.target.value)}
+                    >
+                      <option value="">Toutes</option>
+                      {uniqueCategories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* Brand Filter */}
+                  <div className="flex flex-col items-center">
+                    <label className="flex items-center gap-1 justify-center text-center w-full text-xs font-extrabold mb-2 tracking-widest uppercase bg-gradient-to-r from-black via-gray-800 to-gray-500 bg-clip-text text-transparent">
+                      {/* Brand icon */}
+                      <svg xmlns='http://www.w3.org/2000/svg' className='inline w-4 h-4 text-gray-500' fill='none' viewBox='0 0 24 24' stroke='currentColor'><circle cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='2' fill='none'/><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 12h8' /></svg>
+                      Marque
+                    </label>
+                    <select
+                      className="appearance-none border-none rounded-full px-4 py-2 bg-white/80 text-black focus:outline-none focus:ring-2 focus:ring-black shadow-sm transition-all"
+                      value={brandFilter}
+                      onChange={e => setBrandFilter(e.target.value)}
+                    >
+                      <option value="">Toutes</option>
+                      {uniqueBrands.map(brand => (
+                        <option key={brand} value={brand}>{brand}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
         
@@ -75,7 +153,7 @@ const Vehicles = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 h-full">
             {/* Left Column: Vehicle List */}
             <div className="bg-white p-6 md:p-12 lg:p-24 h-full overflow-y-auto">
-              {carsInventory.map((car, index) => (
+              {filteredCars.map((car, index) => (
                 <div 
                   key={car.id}
                   className={`border-b border-gray-100 py-8 cursor-pointer transition-all duration-500 ${car.id === activeCar.id ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}
