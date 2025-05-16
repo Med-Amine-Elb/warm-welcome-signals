@@ -27,6 +27,12 @@ const ScrollAnimation = ({ children }: ScrollAnimationProps) => {
                 // Cast the target to HTMLElement to access style property
                 (entry.target as HTMLElement).style.transitionDelay = delay;
               }
+              
+              // Handle large number animations (like the "01", "02" in the UJET design)
+              const largeNumber = entry.target.querySelector('.text-7xl, .text-8xl, .text-9xl');
+              if (largeNumber) {
+                largeNumber.classList.add('animate-in');
+              }
             } else {
               // Optional: remove the class when out of viewport for re-animation on scroll back
               // Uncomment if you want elements to re-animate when scrolled back into view
