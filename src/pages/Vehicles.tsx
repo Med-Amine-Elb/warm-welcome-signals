@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -13,7 +14,8 @@ const carsInventory = [
     price: "145 900",
     image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fG1lcmNlZGVzJTIwYW1nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
     year: 2023,
-    category: "Sport"
+    category: "Sport",
+    brand: "Mercedes-Benz" // Added brand property
   },
   {
     id: 2,
@@ -21,7 +23,8 @@ const carsInventory = [
     price: "189 500",
     image: "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8YXVkaSUyMHI4fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
     year: 2022,
-    category: "Sport"
+    category: "Sport",
+    brand: "Audi" // Added brand property
   },
   {
     id: 3,
@@ -29,7 +32,8 @@ const carsInventory = [
     price: "98 750",
     image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTV8fGJtdyUyMG00fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
     year: 2023,
-    category: "Sport"
+    category: "Sport",
+    brand: "BMW" // Added brand property
   },
   {
     id: 4,
@@ -37,7 +41,8 @@ const carsInventory = [
     price: "155 400",
     image: "https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cG9yc2NoZSUyMDkxMXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
     year: 2022,
-    category: "Sport"
+    category: "Sport",
+    brand: "Porsche" // Added brand property
   }
 ];
 
@@ -51,7 +56,7 @@ const Vehicles = () => {
   const [brandFilter, setBrandFilter] = useState('');
 
   const uniqueCategories = Array.from(new Set(carsInventory.map(car => car.category)));
-  const uniqueBrands = Array.from(new Set((carsInventory).map(car => car.brand).filter(Boolean)));
+  const uniqueBrands = Array.from(new Set(carsInventory.map(car => car.brand)));
 
   const filteredCars = carsInventory
     .filter(car => (categoryFilter ? car.category === categoryFilter : true))
