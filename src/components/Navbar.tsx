@@ -8,10 +8,11 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   
-  // Check if we're on the About or Services page
+  // Check if we're on the About, Services or Contact page
   const isAboutPage = location.pathname === '/about';
   const isServicesPage = location.pathname === '/services';
-  const useWhiteText = isAboutPage || isServicesPage;
+  const isContactPage = location.pathname === '/contact';
+  const useWhiteText = isAboutPage || isServicesPage || isContactPage;
 
   useEffect(() => {
     const handleScroll = () => {
