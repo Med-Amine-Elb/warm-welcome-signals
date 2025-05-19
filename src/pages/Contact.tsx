@@ -1,5 +1,4 @@
-
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Instagram, Facebook, Linkedin } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -7,9 +6,14 @@ import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
+import { motion, AnimatePresence } from "framer-motion";
 
 const Contact = () => {
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
+    // Set mounted state immediately
+    setIsMounted(true);
     window.scrollTo(0, 0);
   }, []);
 
@@ -25,38 +29,75 @@ const Contact = () => {
     });
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <Toaster position="top-right" />
       
       {/* Contact Hero Section */}
-      <section className="relative w-full h-[60vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 bg-black z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/30 z-10"></div>
-        </div>
-        <div className="container mx-auto px-6 md:px-16 relative z-20 text-white">
+      <section className="relative w-full h-[60vh] flex items-center">
+        {/* Background */}
+        <div className="absolute inset-0 bg-black z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/30 z-10"></div>
+        {/* Animated Text Content */}
+        <motion.div
+          className="container mx-auto px-6 md:px-16 relative text-white z-20"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
           <div className="max-w-3xl">
-            <h1 
+            <motion.h1
               className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight"
-              data-scroll="reveal"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
             >
               Contact
-            </h1>
-            <div className="h-1 w-24 bg-white my-8" data-scroll="fade-right"></div>
-            <p 
+            </motion.h1>
+            <motion.div
+              className="h-1 w-24 bg-white my-8"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
+              style={{ originX: 0 }}
+            />
+            <motion.p
               className="text-xl md:text-2xl max-w-lg"
-              data-scroll="fade-up"
-              style={{ '--scroll-delay': '2' } as React.CSSProperties}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
             >
               Notre équipe est à votre disposition pour répondre à toutes vos questions et vous accompagner dans votre expérience automobile de luxe.
-            </p>
+            </motion.p>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Breadcrumb */}
-      <div className="w-full bg-gray-100 py-4">
+      <div className="w-full bg-gray-100 py-4 relative z-30">
         <div className="container mx-auto px-6 md:px-16">
           <div className="flex items-center text-sm">
             <Link to="/" className="text-gray-500 hover:text-black">Accueil</Link>
@@ -67,31 +108,29 @@ const Contact = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-grow py-20 bg-white">
-        <div className="container mx-auto px-6 md:px-16">
-          
+      <motion.main 
+        className="flex-grow bg-white relative z-10"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <div className="container mx-auto px-6 md:px-16 py-20">
           {/* Contact Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            
             {/* Left Column - Contact Information */}
-            <div className="space-y-16">
-              <div 
-                className="space-y-6"
-                data-scroll="fade-up"
-                style={{ '--scroll-delay': '0' } as React.CSSProperties}
-              >
+            <motion.div 
+              className="space-y-16"
+              variants={itemVariants}
+            >
+              <div className="space-y-6">
                 <h2 className="text-4xl md:text-5xl font-bold">DriveLuxe</h2>
                 <p className="text-lg text-gray-600 max-w-md">
                   Nous sommes spécialisés dans la location de voitures de luxe et services automobiles exclusifs pour des expériences inoubliables.
                 </p>
               </div>
 
-              <div 
-                className="space-y-10"
-                data-scroll="fade-up"
-                style={{ '--scroll-delay': '2' } as React.CSSProperties}
-              >
-                <div className="flex items-start space-x-4">
+              <div className="space-y-10">
+                <motion.div variants={itemVariants} className="flex items-start space-x-4">
                   <div className="p-3 bg-gray-100 rounded-full">
                     <MapPin className="h-6 w-6" />
                   </div>
@@ -102,9 +141,9 @@ const Contact = () => {
                       <p>75008 Paris, France</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="flex items-start space-x-4">
+                <motion.div variants={itemVariants} className="flex items-start space-x-4">
                   <div className="p-3 bg-gray-100 rounded-full">
                     <Mail className="h-6 w-6" />
                   </div>
@@ -112,9 +151,9 @@ const Contact = () => {
                     <h3 className="text-xl font-bold mb-2">Email</h3>
                     <p className="text-gray-600">info@driveluxe.com</p>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="flex items-start space-x-4">
+                <motion.div variants={itemVariants} className="flex items-start space-x-4">
                   <div className="p-3 bg-gray-100 rounded-full">
                     <Phone className="h-6 w-6" />
                   </div>
@@ -122,18 +161,18 @@ const Contact = () => {
                     <h3 className="text-xl font-bold mb-2">Téléphone</h3>
                     <p className="text-gray-600">+33 1 23 45 67 89</p>
                   </div>
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div variants={itemVariants}>
                   <h3 className="text-xl font-bold mb-4">Horaires</h3>
                   <div className="space-y-1 text-gray-600">
                     <p>Lundi - Vendredi: 9h - 19h</p>
                     <p>Samedi: 10h - 18h</p>
                     <p>Dimanche: Fermé</p>
                   </div>
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div variants={itemVariants}>
                   <h3 className="text-xl font-bold mb-4">Suivez-nous</h3>
                   <div className="flex space-x-4 text-gray-600">
                     <a href="#" className="hover:text-black transition-colors">
@@ -146,68 +185,71 @@ const Contact = () => {
                       <Linkedin className="h-6 w-6" />
                     </a>
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
             
             {/* Right Column - Contact Cards */}
-            <div className="space-y-8">
+            <motion.div 
+              className="space-y-8"
+              variants={itemVariants}
+            >
               {/* Card 1 - Schedule a Call */}
-              <Card 
-                className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-shadow"
-                data-scroll="zoom-in"
-                style={{ '--scroll-delay': '0' } as React.CSSProperties}
-              >
-                <CardContent className="p-0">
-                  <div className="relative p-10 group">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-2xl font-bold mb-2">PROGRAMMEZ UN APPEL</h3>
-                        <p className="text-gray-600 mb-8">Définissez un rendez-vous téléphonique avec notre équipe</p>
-                        <button 
-                          onClick={handleScheduleCall}
-                          className="text-black font-medium text-underline"
-                        >
-                          PROGRAMMER
-                        </button>
+              <motion.div variants={itemVariants}>
+                <Card 
+                  className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <CardContent className="p-0">
+                    <div className="relative p-10 group">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-2xl font-bold mb-2">PROGRAMMEZ UN APPEL</h3>
+                          <p className="text-gray-600 mb-8">Définissez un rendez-vous téléphonique avec notre équipe</p>
+                          <button 
+                            onClick={handleScheduleCall}
+                            className="text-black font-medium text-underline"
+                          >
+                            PROGRAMMER
+                          </button>
+                        </div>
+                        <span className="text-7xl md:text-9xl font-bold text-gray-100 transition-all duration-300 group-hover:text-gray-200">01</span>
                       </div>
-                      <span className="text-7xl md:text-9xl font-bold text-gray-100 transition-all duration-300 group-hover:text-gray-200">01</span>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </motion.div>
                 
               {/* Card 2 - Send a Message */}
-              <Card 
-                className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-shadow"
-                data-scroll="zoom-in"
-                style={{ '--scroll-delay': '2' } as React.CSSProperties}
-              >
-                <CardContent className="p-0">
-                  <div className="relative p-10 group">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-2xl font-bold mb-2">ENVOYEZ UN MESSAGE</h3>
-                        <p className="text-gray-600 mb-8">Posez-nous vos questions ou faites une demande spéciale</p>
-                        <button 
-                          onClick={handleSendMessage}
-                          className="text-black font-medium text-underline"
-                        >
-                          CONTACTER
-                        </button>
+              <motion.div variants={itemVariants}>
+                <Card 
+                  className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <CardContent className="p-0">
+                    <div className="relative p-10 group">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-2xl font-bold mb-2">ENVOYEZ UN MESSAGE</h3>
+                          <p className="text-gray-600 mb-8">Posez-nous vos questions ou faites une demande spéciale</p>
+                          <button 
+                            onClick={handleSendMessage}
+                            className="text-black font-medium text-underline"
+                          >
+                            CONTACTER
+                          </button>
+                        </div>
+                        <span className="text-7xl md:text-9xl font-bold text-gray-100 transition-all duration-300 group-hover:text-gray-200">02</span>
                       </div>
-                      <span className="text-7xl md:text-9xl font-bold text-gray-100 transition-all duration-300 group-hover:text-gray-200">02</span>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </motion.div>
           </div>
 
           {/* Map Section */}
-          <div 
-            className="mt-24 h-96 bg-gray-100 relative overflow-hidden"
-            data-scroll="fade-up"
+          <motion.div 
+            className="mt-24 h-96 bg-gray-100 relative overflow-hidden z-20"
+            variants={itemVariants}
           >
             <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
               <iframe 
@@ -220,9 +262,9 @@ const Contact = () => {
                 referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.main>
 
       <Footer />
     </div>

@@ -1,5 +1,4 @@
-
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import About from './pages/About';
 import Services from './pages/Services';
@@ -10,41 +9,17 @@ import NotFound from './pages/NotFound';
 import ScrollAnimation from './components/ScrollAnimation';
 import './App.css';
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Index />
-  },
-  {
-    path: '/about',
-    element: <About />
-  },
-  {
-    path: '/services',
-    element: <Services />
-  },
-  {
-    path: '/vehicles',
-    element: <Vehicles />
-  },
-  {
-    path: '/vehicles/:id',
-    element: <VehicleDetail />
-  },
-  {
-    path: '/contact',
-    element: <Contact />
-  },
-  {
-    path: '*',
-    element: <NotFound />
-  }
-]);
-
 const App = () => {
   return (
     <ScrollAnimation>
-      <RouterProvider router={router} />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/vehicles" element={<Vehicles />} />
+        <Route path="/vehicles/:id" element={<VehicleDetail />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
     </ScrollAnimation>
   );
 };
