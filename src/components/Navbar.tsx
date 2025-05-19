@@ -14,20 +14,24 @@ const Navbar = () => {
   const isContactPage = location.pathname === '/contact';
   const useWhiteText = isAboutPage || isServicesPage || isContactPage;
 
+  // Force initial scroll check on route changes
   useEffect(() => {
-    const handleScroll = () => {
+    const checkScroll = () => {
       if (window.scrollY > 10) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
       }
     };
-
-    window.addEventListener('scroll', handleScroll);
+    
+    // Check scroll position immediately on page load/route change
+    checkScroll();
+    
+    window.addEventListener('scroll', checkScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', checkScroll);
     };
-  }, []);
+  }, [location.pathname]); // Re-run when path changes
 
   return (
     <header 

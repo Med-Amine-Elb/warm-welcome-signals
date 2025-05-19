@@ -1,5 +1,4 @@
-
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Instagram, Facebook, Linkedin } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -9,8 +8,18 @@ import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 
 const Contact = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   useEffect(() => {
+    // Scroll to top on component mount
     window.scrollTo(0, 0);
+    
+    // Short timeout to ensure DOM is fully ready before animations
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const handleScheduleCall = () => {
@@ -26,7 +35,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className={`min-h-screen flex flex-col ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
       <Navbar />
       <Toaster position="top-right" />
       
