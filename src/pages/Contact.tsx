@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Instagram, Facebook, Linkedin } from 'lucide-react';
@@ -8,16 +9,18 @@ import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 
 const Contact = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
+  // Track when the component has mounted and is ready to be displayed
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Scroll to top on component mount
+    // Scroll to top immediately
     window.scrollTo(0, 0);
     
-    // Short timeout to ensure DOM is fully ready before animations
+    // Set mounted state after a short delay to ensure DOM is ready
+    // This will trigger the fade-in animation
     const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
+      setIsMounted(true);
+    }, 50);
     
     return () => clearTimeout(timer);
   }, []);
@@ -34,8 +37,13 @@ const Contact = () => {
     });
   };
 
+  // Apply CSS classes for the initial load animation
+  const pageClasses = `min-h-screen flex flex-col ${
+    isMounted ? 'opacity-100' : 'opacity-0'
+  } transition-opacity duration-500`;
+
   return (
-    <div className={`min-h-screen flex flex-col ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
+    <div className={pageClasses}>
       <Navbar />
       <Toaster position="top-right" />
       

@@ -8,13 +8,13 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   
-  // Check if we're on the About, Services or Contact page
+  // Check if we're on pages that need white text
   const isAboutPage = location.pathname === '/about';
   const isServicesPage = location.pathname === '/services';
   const isContactPage = location.pathname === '/contact';
   const useWhiteText = isAboutPage || isServicesPage || isContactPage;
 
-  // Force initial scroll check on route changes
+  // Check scroll position on mount and whenever pathname changes
   useEffect(() => {
     const checkScroll = () => {
       if (window.scrollY > 10) {
@@ -24,10 +24,13 @@ const Navbar = () => {
       }
     };
     
-    // Check scroll position immediately on page load/route change
+    // Check scroll position immediately on render (crucial for initial page load)
     checkScroll();
     
+    // Add scroll listener
     window.addEventListener('scroll', checkScroll);
+    
+    // Clean up
     return () => {
       window.removeEventListener('scroll', checkScroll);
     };
