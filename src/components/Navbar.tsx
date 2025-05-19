@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
+import ScrollFadeIn from '@/components/ScrollFadeIn';
+import ScrollChargeButton from '@/components/ScrollChargeButton';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -143,14 +145,14 @@ const Navbar = () => {
         </nav>
       )}
       
-      {/* Floating Schedule Button (Inspired by the UJET design) */}
-      <div className="hidden lg:block">
-        <Link to="/contact" className="floating-button">
+      {/* Fixed Floating Schedule Button (bottom right, large screens only) */}
+      <div className="fixed bottom-8 right-8 z-50 hidden lg:block">
+        <ScrollChargeButton to="/contact">
           <div className="text-xs uppercase tracking-wider text-center leading-tight">
             <span className="block">Prendre</span>
             <span className="block">RDV</span>
           </div>
-        </Link>
+        </ScrollChargeButton>
       </div>
     </header>
   );

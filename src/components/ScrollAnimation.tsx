@@ -1,5 +1,5 @@
-
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface ScrollAnimationProps {
   children: React.ReactNode;
@@ -7,6 +7,7 @@ interface ScrollAnimationProps {
 
 const ScrollAnimation = ({ children }: ScrollAnimationProps) => {
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
     // Small timeout to ensure DOM is fully loaded
@@ -76,7 +77,7 @@ const ScrollAnimation = ({ children }: ScrollAnimationProps) => {
       }
       clearTimeout(timeout);
     };
-  }, []);
+  }, [location.pathname]);
 
   return <>{children}</>;
 };

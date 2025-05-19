@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
+import ScrollFadeIn from '@/components/ScrollFadeIn';
 
 // Car inventory data
 const carsInventory = [
@@ -55,6 +55,12 @@ const Vehicles = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [brandFilter, setBrandFilter] = useState('');
 
+  const resetFilters = () => {
+    setPriceOrder('asc');
+    setCategoryFilter('');
+    setBrandFilter('');
+  };
+
   const uniqueCategories = Array.from(new Set(carsInventory.map(car => car.category)));
   const uniqueBrands = Array.from(new Set(carsInventory.map(car => car.brand)));
 
@@ -66,6 +72,8 @@ const Vehicles = () => {
       const priceB = parseInt(b.price.replace(/\s/g, ''));
       return priceOrder === 'asc' ? priceA - priceB : priceB - priceA;
     });
+
+  const [activeFilterTab, setActiveFilterTab] = useState<null | 'prix' | 'categorie' | 'marque'>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -84,71 +92,119 @@ const Vehicles = () => {
         {/* Minimalist Hero/Header */}
         <section className="py-8 px-6 md:py-12 md:px-12 lg:px-24 mt-16 md:mt-24">
           <div className="max-w-screen-xl mx-auto">
-            <h1 data-scroll="reveal" className="ujet-heading font-black text-4xl md:text-7xl mb-2 bg-gradient-to-r from-black via-gray-800 to-gray-500 bg-clip-text text-transparent animate-fade-in">
-              Notre Collection
-            </h1>
+            <ScrollFadeIn>
+              <h1 className="ujet-heading font-black text-4xl md:text-7xl mb-2 bg-gradient-to-r from-black via-gray-800 to-gray-500 bg-clip-text text-transparent animate-fade-in">
+                Notre Collection
+              </h1>
+            </ScrollFadeIn>
             <div className="ujet-divider"></div>
             <p className="ujet-subheading text-lg md:text-2xl font-light text-gray-600 mb-2 animate-fade-in delay-200">
               Découvrez l'élite de l'automobile de luxe
             </p>
-            {/* Filter Bar */}
-            <div className="w-full flex justify-center mt-6 mb-8">
-              <div className="backdrop-blur-md bg-white/60 shadow-lg rounded-2xl px-6 py-4 max-w-2xl w-full border border-gray-200">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Price Filter */}
-                  <div className="flex flex-col items-center">
-                    <label className="flex justify-center items-center gap-2 text-center w-full text-xs font-extrabold mb-2 tracking-widest uppercase bg-gradient-to-r from-black via-gray-800 to-gray-500 bg-clip-text text-transparent">
-                      {/* Price icon */}
-                      <svg xmlns='http://www.w3.org/2000/svg' className='inline w-4 h-4 text-gray-500' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v8m0 0l-3-3m3 3l3-3' /></svg>
-                      Prix
-                    </label>
-                    <select
-                      className="appearance-none border-none rounded-full px-4 py-2 bg-white/80 text-black focus:outline-none focus:ring-2 focus:ring-black shadow-sm transition-all"
-                      value={priceOrder}
-                      onChange={e => setPriceOrder(e.target.value)}
+            {/* Modern Filter Bar */}
+            <div className="w-full flex flex-col items-center mt-6 mb-8">
+              {/* Tabs Row */}
+              <div className="w-full max-w-3xl flex items-center justify-between bg-gray-50 rounded-t-2xl" style={{ minHeight: '48px' }}>
+                {/* All (reset) tab */}
+                <button
+                  className={`ml-4 px-0 py-4 text-base uppercase tracking-widest font-bold border-none bg-transparent transition text-left ${!activeFilterTab && priceOrder === 'asc' && categoryFilter === '' && brandFilter === '' ? 'text-black' : 'text-gray-500 hover:text-black'}`}
+                  onClick={() => {
+                    setActiveFilterTab(null);
+                    resetFilters();
+                  }}
+                  style={{ letterSpacing: '0.08em' }}
+                >
+                  All
+                </button>
+                {/* Filter tabs */}
+                <div className="flex-1 flex justify-center items-center space-x-8">
+                  {[
+                    { key: 'prix', label: 'PRIX' },
+                    { key: 'categorie', label: 'CATÉGORIE' },
+                    { key: 'marque', label: 'MARQUE' }
+                  ].map(tab => (
+                    <button
+                      key={tab.key}
+                      className={`px-0 py-4 text-base uppercase tracking-widest font-bold border-none bg-transparent transition ${activeFilterTab === tab.key ? 'text-black' : 'text-gray-500 hover:text-black'}`}
+                      onClick={() => setActiveFilterTab(tab.key as typeof activeFilterTab)}
+                      style={{ letterSpacing: '0.08em' }}
                     >
-                      <option value="asc">Croissant</option>
-                      <option value="desc">Décroissant</option>
-                    </select>
-                  </div>
-                  {/* Category Filter */}
-                  <div className="flex flex-col items-center">
-                    <label className="flex items-center gap-1 justify-center text-center w-full text-xs font-extrabold mb-2 tracking-widest uppercase bg-gradient-to-r from-black via-gray-800 to-gray-500 bg-clip-text text-transparent">
-                      {/* Category icon */}
-                      <svg xmlns='http://www.w3.org/2000/svg' className='inline w-4 h-4 text-gray-500' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16M4 18h16' /></svg>
-                      Catégorie
-                    </label>
-                    <select
-                      className="appearance-none border-none rounded-full px-4 py-2 bg-white/80 text-black focus:outline-none focus:ring-2 focus:ring-black shadow-sm transition-all"
-                      value={categoryFilter}
-                      onChange={e => setCategoryFilter(e.target.value)}
-                    >
-                      <option value="">Toutes</option>
-                      {uniqueCategories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                  </div>
-                  {/* Brand Filter */}
-                  <div className="flex flex-col items-center">
-                    <label className="flex items-center gap-1 justify-center text-center w-full text-xs font-extrabold mb-2 tracking-widest uppercase bg-gradient-to-r from-black via-gray-800 to-gray-500 bg-clip-text text-transparent">
-                      {/* Brand icon */}
-                      <svg xmlns='http://www.w3.org/2000/svg' className='inline w-4 h-4 text-gray-500' fill='none' viewBox='0 0 24 24' stroke='currentColor'><circle cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='2' fill='none'/><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 12h8' /></svg>
-                      Marque
-                    </label>
-                    <select
-                      className="appearance-none border-none rounded-full px-4 py-2 bg-white/80 text-black focus:outline-none focus:ring-2 focus:ring-black shadow-sm transition-all"
-                      value={brandFilter}
-                      onChange={e => setBrandFilter(e.target.value)}
-                    >
-                      <option value="">Toutes</option>
-                      {uniqueBrands.map(brand => (
-                        <option key={brand} value={brand}>{brand}</option>
-                      ))}
-                    </select>
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+                {/* Close (X) button */}
+                <button
+                  className="mr-4 p-2 text-gray-500 hover:text-black bg-transparent border-none text-xl"
+                  onClick={() => setActiveFilterTab(null)}
+                  aria-label="Fermer le filtre"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              {/* Divider */}
+              <div className="w-full max-w-3xl border-b border-gray-200" />
+              {/* Filter Options Bar */}
+              {activeFilterTab && (
+                <div className="w-full max-w-3xl flex items-center justify-center bg-transparent px-6 py-4">
+                  <div className="flex items-center space-x-6">
+                    {activeFilterTab === 'prix' && (
+                      <>
+                        <button
+                          className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${priceOrder === 'asc' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
+                          onClick={() => setPriceOrder('asc')}
+                        >
+                          Croissant
+                        </button>
+                        <button
+                          className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${priceOrder === 'desc' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
+                          onClick={() => setPriceOrder('desc')}
+                        >
+                          Décroissant
+                        </button>
+                      </>
+                    )}
+                    {activeFilterTab === 'categorie' && (
+                      <>
+                        <button
+                          className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${categoryFilter === '' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
+                          onClick={() => setCategoryFilter('')}
+                        >
+                          Toutes
+                        </button>
+                        {uniqueCategories.map(cat => (
+                          <button
+                            key={cat}
+                            className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${categoryFilter === cat ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
+                            onClick={() => setCategoryFilter(cat)}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </>
+                    )}
+                    {activeFilterTab === 'marque' && (
+                      <>
+                        <button
+                          className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${brandFilter === '' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
+                          onClick={() => setBrandFilter('')}
+                        >
+                          Toutes
+                        </button>
+                        {uniqueBrands.map(brand => (
+                          <button
+                            key={brand}
+                            className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${brandFilter === brand ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
+                            onClick={() => setBrandFilter(brand)}
+                          >
+                            {brand}
+                          </button>
+                        ))}
+                      </>
+                    )}
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </section>
@@ -213,28 +269,30 @@ const Vehicles = () => {
         </section>
         
         {/* Call to Action */}
-        <section className="py-16 px-6 md:py-24 md:px-12 lg:px-24 bg-black text-white">
-          <div className="max-w-screen-xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
-              <div data-scroll="fade-right">
-                <h2 className="ujet-heading text-3xl md:text-4xl lg:text-5xl mb-6">
-                  Découvrez notre collection exclusive
-                </h2>
-                <p className="text-white/70 mb-8 max-w-lg">
-                  Nous proposons une sélection de voitures de luxe pour tous les goûts et tous les budgets.
-                </p>
-              </div>
-              <div className="flex justify-start md:justify-end" data-scroll="fade-left">
-                <Button
-                  className="rounded-full bg-white text-black px-8 py-6 text-sm uppercase tracking-wider hover:bg-gray-200"
-                  asChild
-                >
-                  <Link to="/contact">Contactez-nous</Link>
-                </Button>
+        <ScrollFadeIn y={60}>
+          <section className="py-16 px-6 md:py-24 md:px-12 lg:px-24 bg-black text-white">
+            <div className="max-w-screen-xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+                <div>
+                  <h2 className="ujet-heading text-3xl md:text-4xl lg:text-5xl mb-6">
+                    Découvrez notre collection exclusive
+                  </h2>
+                  <p className="text-white/70 mb-8 max-w-lg">
+                    Nous proposons une sélection de voitures de luxe pour tous les goûts et tous les budgets.
+                  </p>
+                </div>
+                <div className="flex justify-start md:justify-end">
+                  <Button
+                    className="rounded-full bg-white text-black px-8 py-6 text-sm uppercase tracking-wider hover:bg-gray-200"
+                    asChild
+                  >
+                    <Link to="/contact">Contactez-nous</Link>
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </ScrollFadeIn>
       </main>
       
       <Footer />

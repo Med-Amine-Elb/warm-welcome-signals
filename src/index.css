@@ -265,6 +265,14 @@
   .animate-bounce-slow {
     animation: bounce-slow 2s infinite ease-in-out;
   }
+
+  .group .dot-fill {
+    transform: scale(0);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .group:hover .dot-fill {
+    transform: scale(1);
+  }
 }
 
 #root {
@@ -320,4 +328,12 @@
 /* UJET-style grid layout */
 .ujet-grid {
   @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8;
+}
+
+/* Animated dot for contact buttons */
+.group:hover .dot-circle {
+  fill: currentColor;
+}
+.dot-circle {
+  transition: fill 0.2s;
 }
