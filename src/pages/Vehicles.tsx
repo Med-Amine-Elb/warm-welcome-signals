@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, X } from 'lucide-react';
+import { ArrowRight, X, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import ScrollFadeIn from '@/components/ScrollFadeIn';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
 
 // Car inventory data
 const carsInventory = [
@@ -15,7 +17,7 @@ const carsInventory = [
     image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fG1lcmNlZGVzJTIwYW1nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
     year: 2023,
     category: "Sport",
-    brand: "Mercedes-Benz" // Added brand property
+    brand: "Mercedes-Benz"
   },
   {
     id: 2,
@@ -24,7 +26,7 @@ const carsInventory = [
     image: "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8YXVkaSUyMHI4fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
     year: 2022,
     category: "Sport",
-    brand: "Audi" // Added brand property
+    brand: "Audi"
   },
   {
     id: 3,
@@ -33,7 +35,7 @@ const carsInventory = [
     image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTV8fGJtdyUyMG00fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
     year: 2023,
     category: "Sport",
-    brand: "BMW" // Added brand property
+    brand: "BMW"
   },
   {
     id: 4,
@@ -42,38 +44,83 @@ const carsInventory = [
     image: "https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cG9yc2NoZSUyMDkxMXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
     year: 2022,
     category: "Sport",
-    brand: "Porsche" // Added brand property
+    brand: "Porsche"
   }
 ];
 
 const Vehicles = () => {
   const [activeCar, setActiveCar] = useState(carsInventory[0]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Filter state and helpers must be inside the component
+  // Quick filter states
   const [priceOrder, setPriceOrder] = useState('asc');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [brandFilter, setBrandFilter] = useState('');
+  const [activeFilterTab, setActiveFilterTab] = useState<null | 'prix' | 'categorie' | 'marque'>(null);
+
+  // Advanced filter states
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200000]);
+  const [yearRange, setYearRange] = useState<[number, number]>([2020, 2024]);
+  const [sortOrder, setSortOrder] = useState<'price-asc' | 'price-desc' | 'year-asc' | 'year-desc'>('price-asc');
 
   const resetFilters = () => {
+    // Reset quick filters
     setPriceOrder('asc');
     setCategoryFilter('');
     setBrandFilter('');
+    setActiveFilterTab(null);
+    
+    // Reset advanced filters
+    setSelectedCategories([]);
+    setSelectedBrands([]);
+    setPriceRange([0, 200000]);
+    setYearRange([2020, 2024]);
+    setSortOrder('price-asc');
   };
 
   const uniqueCategories = Array.from(new Set(carsInventory.map(car => car.category)));
   const uniqueBrands = Array.from(new Set(carsInventory.map(car => car.brand)));
 
   const filteredCars = carsInventory
+    // Apply quick filters
     .filter(car => (categoryFilter ? car.category === categoryFilter : true))
     .filter(car => (brandFilter ? car.brand === brandFilter : true))
     .sort((a, b) => {
       const priceA = parseInt(a.price.replace(/\s/g, ''));
       const priceB = parseInt(b.price.replace(/\s/g, ''));
       return priceOrder === 'asc' ? priceA - priceB : priceB - priceA;
+    })
+    // Apply advanced filters
+    .filter(car => {
+      const price = parseInt(car.price.replace(/\s/g, ''));
+      return price >= priceRange[0] && price <= priceRange[1];
+    })
+    .filter(car => {
+      if (selectedCategories.length === 0) return true;
+      return selectedCategories.includes(car.category);
+    })
+    .filter(car => {
+      if (selectedBrands.length === 0) return true;
+      return selectedBrands.includes(car.brand);
+    })
+    .filter(car => car.year >= yearRange[0] && car.year <= yearRange[1])
+    .sort((a, b) => {
+      switch (sortOrder) {
+        case 'price-asc':
+          return parseInt(a.price.replace(/\s/g, '')) - parseInt(b.price.replace(/\s/g, ''));
+        case 'price-desc':
+          return parseInt(b.price.replace(/\s/g, '')) - parseInt(a.price.replace(/\s/g, ''));
+        case 'year-asc':
+          return a.year - b.year;
+        case 'year-desc':
+          return b.year - a.year;
+        default:
+          return 0;
+      }
     });
-
-  const [activeFilterTab, setActiveFilterTab] = useState<null | 'prix' | 'categorie' | 'marque'>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -101,7 +148,8 @@ const Vehicles = () => {
             <p className="ujet-subheading text-lg md:text-2xl font-light text-gray-600 mb-2 animate-fade-in delay-200">
               Découvrez l'élite de l'automobile de luxe
             </p>
-            {/* Modern Filter Bar */}
+
+            {/* Quick Filter Bar */}
             <div className="w-full flex flex-col items-center mt-6 mb-8">
               {/* Tabs Row */}
               <div className="w-full max-w-3xl flex items-center justify-between bg-gray-50 rounded-t-2xl" style={{ minHeight: '48px' }}>
@@ -133,14 +181,15 @@ const Vehicles = () => {
                     </button>
                   ))}
                 </div>
-                {/* Close (X) button */}
-                <button
-                  className="mr-4 p-2 text-gray-500 hover:text-black bg-transparent border-none text-xl"
-                  onClick={() => setActiveFilterTab(null)}
-                  aria-label="Fermer le filtre"
+                {/* Advanced Filter Button */}
+                <Button
+                  variant="ghost"
+                  className="mr-4 flex items-center gap-2"
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
                 >
-                  <X className="w-5 h-5" />
-                </button>
+                  <SlidersHorizontal className="w-4 h-4" />
+                  <span className="hidden md:inline">Filtres avancés</span>
+                </Button>
               </div>
               {/* Divider */}
               <div className="w-full max-w-3xl border-b border-gray-200" />
@@ -206,95 +255,197 @@ const Vehicles = () => {
                 </div>
               )}
             </div>
-          </div>
-        </section>
-        
-        {/* Main Vehicle Display - Clean Split Layout */}
-        <section className="w-full min-h-[80vh]">
-          <div className="grid grid-cols-1 md:grid-cols-2 h-full">
-            {/* Left Column: Vehicle List */}
-            <div className="bg-white p-6 md:p-12 lg:p-24 h-full overflow-y-auto">
-              {filteredCars.map((car, index) => (
-                <div 
-                  key={car.id}
-                  className={`border-b border-gray-100 py-8 cursor-pointer transition-all duration-500 ${car.id === activeCar.id ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}
-                  onClick={() => setActiveCar(car)}
-                  data-scroll="fade-right"
-                  style={{ '--scroll-delay': index * 2 } as React.CSSProperties}
-                >
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-500 mb-1">{car.category}</span>
-                    <h2 className={`text-2xl md:text-3xl mb-2 transition-all ${car.id === activeCar.id ? 'font-medium' : 'font-light'}`}>
-                      {car.name}
-                    </h2>
-                    <div className="flex items-center justify-between">
-                      <span className="font-light">{car.year}</span>
-                      <Button
-                        variant="ghost"
-                        className={`p-0 h-auto ${car.id === activeCar.id ? 'opacity-100' : 'opacity-0'}`}
-                        asChild
-                      >
-                        <Link to={`/vehicles/${car.id}`} className="text-underline">
-                          Explore <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                      </Button>
+
+            {/* Advanced Filter Sidebar */}
+            {isFilterOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
+                <div className="w-full max-w-md bg-white h-full overflow-y-auto p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold">Filtres avancés</h2>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsFilterOpen(false)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Price Range */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-semibold mb-4">Prix</h3>
+                    <Slider
+                      value={priceRange}
+                      onValueChange={(value) => setPriceRange(value as [number, number])}
+                      min={0}
+                      max={200000}
+                      step={1000}
+                      className="mb-2"
+                    />
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>{priceRange[0].toLocaleString()} €</span>
+                      <span>{priceRange[1].toLocaleString()} €</span>
                     </div>
                   </div>
+
+                  {/* Year Range */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-semibold mb-4">Année</h3>
+                    <Slider
+                      value={yearRange}
+                      onValueChange={(value) => setYearRange(value as [number, number])}
+                      min={2020}
+                      max={2024}
+                      step={1}
+                      className="mb-2"
+                    />
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>{yearRange[0]}</span>
+                      <span>{yearRange[1]}</span>
+                    </div>
+                  </div>
+
+                  {/* Categories */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-semibold mb-4">Catégories</h3>
+                    <div className="space-y-2">
+                      {uniqueCategories.map(category => (
+                        <div key={category} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`category-${category}`}
+                            checked={selectedCategories.includes(category)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedCategories([...selectedCategories, category]);
+                              } else {
+                                setSelectedCategories(selectedCategories.filter(c => c !== category));
+                              }
+                            }}
+                          />
+                          <label
+                            htmlFor={`category-${category}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {category}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Brands */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-semibold mb-4">Marques</h3>
+                    <div className="space-y-2">
+                      {uniqueBrands.map(brand => (
+                        <div key={brand} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`brand-${brand}`}
+                            checked={selectedBrands.includes(brand)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedBrands([...selectedBrands, brand]);
+                              } else {
+                                setSelectedBrands(selectedBrands.filter(b => b !== brand));
+                              }
+                            }}
+                          />
+                          <label
+                            htmlFor={`brand-${brand}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {brand}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Sort Order */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-semibold mb-4">Trier par</h3>
+                    <select
+                      value={sortOrder}
+                      onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}
+                      className="w-full p-2 border rounded-md"
+                    >
+                      <option value="price-asc">Prix croissant</option>
+                      <option value="price-desc">Prix décroissant</option>
+                      <option value="year-asc">Année croissante</option>
+                      <option value="year-desc">Année décroissante</option>
+                    </select>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-4">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={resetFilters}
+                    >
+                      Réinitialiser
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onClick={() => setIsFilterOpen(false)}
+                    >
+                      Appliquer
+                    </Button>
+                  </div>
                 </div>
-              ))}
-            </div>
-            
-            {/* Right Column: Selected Vehicle Image */}
-            <div className="h-full bg-gray-100 relative overflow-hidden">
-              <div 
-                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-                style={{
-                  backgroundImage: `url(${activeCar.image})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
-              ></div>
-              <div className="absolute bottom-0 left-0 p-6 md:p-12 bg-white/80 backdrop-blur-sm max-w-md">
-                <p className="text-lg md:text-xl font-light mb-2">{activeCar.price} €</p>
-                <Link 
-                  to={`/vehicles/${activeCar.id}`}
-                  className="text-underline text-sm flex items-center group"
-                >
-                  Voir les détails
-                  <ArrowRight className="ml-2 h-4 w-4 transform transition-transform group-hover:translate-x-1" />
-                </Link>
+              </div>
+            )}
+
+            {/* Main Vehicle Display - Clean Split Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 h-full mt-8">
+              {/* Left Column: Vehicle List */}
+              <div className="bg-white p-6 md:p-12 lg:p-24 h-full overflow-y-auto">
+                {filteredCars.map((car, index) => (
+                  <div 
+                    key={car.id}
+                    className={`border-b border-gray-100 py-8 cursor-pointer transition-all duration-500 ${car.id === activeCar.id ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}
+                    onClick={() => setActiveCar(car)}
+                    data-scroll="fade-right"
+                    style={{ '--scroll-delay': index * 2 } as React.CSSProperties}
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-sm text-gray-500 mb-1">{car.category}</span>
+                      <h2 className={`text-2xl md:text-3xl mb-2 transition-all ${car.id === activeCar.id ? 'font-medium' : 'font-light'}`}>
+                        {car.name}
+                      </h2>
+                      <div className="flex items-center justify-between">
+                        <span className="font-light">{car.year}</span>
+                        <Button
+                          variant="ghost"
+                          className={`p-0 h-auto ${car.id === activeCar.id ? 'opacity-100' : 'opacity-0'}`}
+                          asChild
+                        >
+                          <Link to={`/vehicles/${car.id}`} className="text-underline">
+                            Explore <ArrowRight className="ml-2 h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Right Column: Selected Vehicle Image */}
+              <div className="relative h-[calc(100vh-200px)]">
+                <img
+                  src={activeCar.image}
+                  alt={activeCar.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
+                  <h3 className="text-white text-2xl font-medium mb-2">{activeCar.name}</h3>
+                  <p className="text-white/80">{activeCar.price} €</p>
+                </div>
               </div>
             </div>
           </div>
         </section>
-        
-        {/* Call to Action */}
-        <ScrollFadeIn y={60}>
-          <section className="py-16 px-6 md:py-24 md:px-12 lg:px-24 bg-black text-white">
-            <div className="max-w-screen-xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
-                <div>
-                  <h2 className="ujet-heading text-3xl md:text-4xl lg:text-5xl mb-6">
-                    Découvrez notre collection exclusive
-                  </h2>
-                  <p className="text-white/70 mb-8 max-w-lg">
-                    Nous proposons une sélection de voitures de luxe pour tous les goûts et tous les budgets.
-                  </p>
-                </div>
-                <div className="flex justify-start md:justify-end">
-                  <Button
-                    className="rounded-full bg-white text-black px-8 py-6 text-sm uppercase tracking-wider hover:bg-gray-200"
-                    asChild
-                  >
-                    <Link to="/contact">Contactez-nous</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </section>
-        </ScrollFadeIn>
       </main>
-      
       <Footer />
     </div>
   );
