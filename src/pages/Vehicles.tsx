@@ -7,96 +7,144 @@ import { Button } from '@/components/ui/button';
 import ScrollFadeIn from '@/components/ScrollFadeIn';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
-
-// Car inventory data
-const carsInventory = [
-  {
-    id: 1,
-    name: "Mercedes-Benz AMG GT",
-    price: "145 900",
-    image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fG1lcmNlZGVzJTIwYW1nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    year: 2023,
-    category: "Sport",
-    brand: "Mercedes-Benz"
-  },
-  {
-    id: 2,
-    name: "Audi R8 Spyder",
-    price: "189 500",
-    image: "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8YXVkaSUyMHI4fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    year: 2022,
-    category: "Sport",
-    brand: "Audi"
-  },
-  {
-    id: 3,
-    name: "BMW M4 Competition",
-    price: "98 750",
-    image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTV8fGJtdyUyMG00fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    year: 2023,
-    category: "Sport",
-    brand: "BMW"
-  },
-  {
-    id: 4,
-    name: "Porsche 911 Carrera",
-    price: "155 400",
-    image: "https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cG9yc2NoZSUyMDkxMXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-    year: 2022,
-    category: "Sport",
-    brand: "Porsche"
-  }
-];
+import { vehicleService, Vehicle, PriceRange, YearRange } from '@/services/vehicleService';
 
 const Vehicles = () => {
-  const [activeCar, setActiveCar] = useState(carsInventory[0]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [activeCar, setActiveCar] = useState<Vehicle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200000]);
+  const [yearRange, setYearRange] = useState<[number, number]>([2020, 2024]);
+  const [uniqueCategories, setUniqueCategories] = useState<string[]>([]);
+  const [uniqueBrands, setUniqueBrands] = useState<string[]>([]);
+  const [fuelTypes, setFuelTypes] = useState<string[]>([]);
 
   // Quick filter states
   const [priceOrder, setPriceOrder] = useState('asc');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [brandFilter, setBrandFilter] = useState('');
-  const [activeFilterTab, setActiveFilterTab] = useState<null | 'prix' | 'categorie' | 'marque'>(null);
+  const [fuelTypeFilter, setFuelTypeFilter] = useState('');
+  const [activeFilterTab, setActiveFilterTab] = useState<null | 'prix' | 'categorie' | 'marque' | 'carburant'>(null);
 
   // Advanced filter states
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200000]);
-  const [yearRange, setYearRange] = useState<[number, number]>([2020, 2024]);
+  const [selectedFuelTypes, setSelectedFuelTypes] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<'price-asc' | 'price-desc' | 'year-asc' | 'year-desc'>('price-asc');
 
+  // Add a state to trigger fade-in animation
+  const [fadeKey, setFadeKey] = useState(0);
+
+  // Change page size to 4
+  const PAGE_SIZE = 4;
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        setIsLoading(true);
+        const [vehiclesData, categories, brands, fuelTypesData, priceRangeData, yearRangeData] = await Promise.all([
+          vehicleService.getAllVehicles(0, PAGE_SIZE),
+          vehicleService.getAllCategories(),
+          vehicleService.getAllBrands(),
+          vehicleService.getFuelTypes(),
+          vehicleService.getPriceRange(),
+          vehicleService.getYearRange()
+        ]);
+
+        setVehicles(vehiclesData.content);
+        setTotalPages(vehiclesData.totalPages);
+        setActiveCar(vehiclesData.content[0]);
+        setUniqueCategories(categories);
+        setUniqueBrands(brands);
+        setFuelTypes(fuelTypesData);
+        setPriceRange([priceRangeData.min, priceRangeData.max]);
+        setYearRange([yearRangeData.min, yearRangeData.max]);
+        setFadeKey(prev => prev + 1); // trigger fade-in
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
+
   const resetFilters = () => {
-    // Reset quick filters
     setPriceOrder('asc');
     setCategoryFilter('');
     setBrandFilter('');
+    setFuelTypeFilter('');
     setActiveFilterTab(null);
-    
-    // Reset advanced filters
     setSelectedCategories([]);
     setSelectedBrands([]);
-    setPriceRange([0, 200000]);
-    setYearRange([2020, 2024]);
+    setSelectedFuelTypes([]);
     setSortOrder('price-asc');
+    setCurrentPage(0);
+    fetchVehicles();
   };
 
-  const uniqueCategories = Array.from(new Set(carsInventory.map(car => car.category)));
-  const uniqueBrands = Array.from(new Set(carsInventory.map(car => car.brand)));
+  const fetchVehicles = async () => {
+    try {
+      setIsLoading(true);
+      let response;
+      
+      if (fuelTypeFilter) {
+        response = await vehicleService.getVehiclesByFuelType(
+          fuelTypeFilter,
+          currentPage,
+          PAGE_SIZE,
+          sortOrder.includes('price') ? 'price' : 'modelYear',
+          sortOrder.includes('desc') ? 'DESC' : 'ASC'
+        );
+      } else {
+        response = await vehicleService.getAllVehicles(
+          currentPage,
+          PAGE_SIZE,
+          sortOrder.includes('price') ? 'price' : 'modelYear',
+          sortOrder.includes('desc') ? 'DESC' : 'ASC'
+        );
+      }
 
-  const filteredCars = carsInventory
+      setVehicles(response.content);
+      setTotalPages(response.totalPages);
+      // Always select the first car of the new page
+      setActiveCar(response.content[0] || null);
+      setFadeKey(prev => prev + 1); // trigger fade-in
+    } catch (error) {
+      console.error('Error fetching vehicles:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVehicles();
+    // eslint-disable-next-line
+  }, [currentPage, sortOrder, fuelTypeFilter]);
+
+  const filteredCars = vehicles
     // Apply quick filters
     .filter(car => (categoryFilter ? car.category === categoryFilter : true))
     .filter(car => (brandFilter ? car.brand === brandFilter : true))
+    .filter(car => (fuelTypeFilter ? car.fuelType === fuelTypeFilter : true))
     .sort((a, b) => {
-      const priceA = parseInt(a.price.replace(/\s/g, ''));
-      const priceB = parseInt(b.price.replace(/\s/g, ''));
-      return priceOrder === 'asc' ? priceA - priceB : priceB - priceA;
+      if (sortOrder === 'price-asc') {
+        return a.price - b.price;
+      } else if (sortOrder === 'price-desc') {
+        return b.price - a.price;
+      } else if (sortOrder === 'year-asc') {
+        return a.modelYear - b.modelYear;
+      } else {
+        return b.modelYear - a.modelYear;
+      }
     })
     // Apply advanced filters
     .filter(car => {
-      const price = parseInt(car.price.replace(/\s/g, ''));
-      return price >= priceRange[0] && price <= priceRange[1];
+      return car.price >= priceRange[0] && car.price <= priceRange[1];
     })
     .filter(car => {
       if (selectedCategories.length === 0) return true;
@@ -106,30 +154,11 @@ const Vehicles = () => {
       if (selectedBrands.length === 0) return true;
       return selectedBrands.includes(car.brand);
     })
-    .filter(car => car.year >= yearRange[0] && car.year <= yearRange[1])
-    .sort((a, b) => {
-      switch (sortOrder) {
-        case 'price-asc':
-          return parseInt(a.price.replace(/\s/g, '')) - parseInt(b.price.replace(/\s/g, ''));
-        case 'price-desc':
-          return parseInt(b.price.replace(/\s/g, '')) - parseInt(a.price.replace(/\s/g, ''));
-        case 'year-asc':
-          return a.year - b.year;
-        case 'year-desc':
-          return b.year - a.year;
-        default:
-          return 0;
-      }
-    });
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    .filter(car => {
+      if (selectedFuelTypes.length === 0) return true;
+      return selectedFuelTypes.includes(car.fuelType);
+    })
+    .filter(car => car.modelYear >= yearRange[0] && car.modelYear <= yearRange[1]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -155,7 +184,7 @@ const Vehicles = () => {
               <div className="w-full max-w-3xl flex items-center justify-between bg-gray-50 rounded-t-2xl" style={{ minHeight: '48px' }}>
                 {/* All (reset) tab */}
                 <button
-                  className={`ml-4 px-0 py-4 text-base uppercase tracking-widest font-bold border-none bg-transparent transition text-left ${!activeFilterTab && priceOrder === 'asc' && categoryFilter === '' && brandFilter === '' ? 'text-black' : 'text-gray-500 hover:text-black'}`}
+                  className={`ml-4 px-0 py-4 text-base uppercase tracking-widest font-bold border-none bg-transparent transition text-left ${!activeFilterTab && priceOrder === 'asc' && categoryFilter === '' && brandFilter === '' && fuelTypeFilter === '' ? 'text-black' : 'text-gray-500 hover:text-black'}`}
                   onClick={() => {
                     setActiveFilterTab(null);
                     resetFilters();
@@ -169,7 +198,8 @@ const Vehicles = () => {
                   {[
                     { key: 'prix', label: 'PRIX' },
                     { key: 'categorie', label: 'CATÉGORIE' },
-                    { key: 'marque', label: 'MARQUE' }
+                    { key: 'marque', label: 'MARQUE' },
+                    { key: 'carburant', label: 'CARBURANT' }
                   ].map(tab => (
                     <button
                       key={tab.key}
@@ -247,6 +277,25 @@ const Vehicles = () => {
                             onClick={() => setBrandFilter(brand)}
                           >
                             {brand}
+                          </button>
+                        ))}
+                      </>
+                    )}
+                    {activeFilterTab === 'carburant' && (
+                      <>
+                        <button
+                          className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${fuelTypeFilter === '' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
+                          onClick={() => setFuelTypeFilter('')}
+                        >
+                          Toutes
+                        </button>
+                        {fuelTypes.map(fuel => (
+                          <button
+                            key={fuel}
+                            className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${fuelTypeFilter === fuel ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
+                            onClick={() => setFuelTypeFilter(fuel)}
+                          >
+                            {fuel}
                           </button>
                         ))}
                       </>
@@ -361,6 +410,34 @@ const Vehicles = () => {
                     </div>
                   </div>
 
+                  {/* Fuel Types */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-semibold mb-4">Carburant</h3>
+                    <div className="space-y-2">
+                      {fuelTypes.map(fuel => (
+                        <div key={fuel} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`fuel-${fuel}`}
+                            checked={selectedFuelTypes.includes(fuel)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedFuelTypes([...selectedFuelTypes, fuel]);
+                              } else {
+                                setSelectedFuelTypes(selectedFuelTypes.filter(f => f !== fuel));
+                              }
+                            }}
+                          />
+                          <label
+                            htmlFor={`fuel-${fuel}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {fuel}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Sort Order */}
                   <div className="mb-6">
                     <h3 className="text-sm font-semibold mb-4">Trier par</h3>
@@ -403,21 +480,21 @@ const Vehicles = () => {
                 {filteredCars.map((car, index) => (
                   <div 
                     key={car.id}
-                    className={`border-b border-gray-100 py-8 cursor-pointer transition-all duration-500 ${car.id === activeCar.id ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}
+                    className={`border-b border-gray-100 py-8 cursor-pointer transition-all duration-500 ${car.id === activeCar?.id ? 'opacity-100' : 'opacity-50 hover:opacity-80'} animate-fade-in`}
                     onClick={() => setActiveCar(car)}
                     data-scroll="fade-right"
                     style={{ '--scroll-delay': index * 2 } as React.CSSProperties}
                   >
                     <div className="flex flex-col">
                       <span className="text-sm text-gray-500 mb-1">{car.category}</span>
-                      <h2 className={`text-2xl md:text-3xl mb-2 transition-all ${car.id === activeCar.id ? 'font-medium' : 'font-light'}`}>
+                      <h2 className={`text-2xl md:text-3xl mb-2 transition-all ${car.id === activeCar?.id ? 'font-medium' : 'font-light'}`}>
                         {car.name}
                       </h2>
                       <div className="flex items-center justify-between">
-                        <span className="font-light">{car.year}</span>
+                        <span className="font-light">{car.modelYear}</span>
                         <Button
                           variant="ghost"
-                          className={`p-0 h-auto ${car.id === activeCar.id ? 'opacity-100' : 'opacity-0'}`}
+                          className={`p-0 h-auto ${car.id === activeCar?.id ? 'opacity-100' : 'opacity-0'}`}
                           asChild
                         >
                           <Link to={`/vehicles/${car.id}`} className="text-underline">
@@ -428,19 +505,52 @@ const Vehicles = () => {
                     </div>
                   </div>
                 ))}
+                {/* Improved Pagination Controls */}
+                <div className="flex justify-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    disabled={currentPage === 0}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    Previous
+                  </Button>
+                  {[...Array(totalPages)].map((_, idx) => (
+                    <Button
+                      key={idx}
+                      variant={currentPage === idx ? "default" : "outline"}
+                      onClick={() => setCurrentPage(idx)}
+                      className={currentPage === idx ? "font-bold" : ""}
+                    >
+                      {idx + 1}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    disabled={currentPage + 1 >= totalPages}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
               </div>
               
               {/* Right Column: Selected Vehicle Image */}
               <div className="relative h-[calc(100vh-200px)]">
-                <img
-                  src={activeCar.image}
-                  alt={activeCar.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
-                  <h3 className="text-white text-2xl font-medium mb-2">{activeCar.name}</h3>
-                  <p className="text-white/80">{activeCar.price} €</p>
-                </div>
+                {activeCar ? (
+                  <>
+                    <img
+                      key={fadeKey}
+                      src={activeCar.imageFileName ? vehicleService.getImageUrl(activeCar.imageFileName) : '/fallback-car.png'}
+                      alt={activeCar.name}
+                      className="w-full h-full object-cover animate-fade-in"
+                      onError={e => { e.currentTarget.src = '/fallback-car.png'; }}
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
+                      <h3 className="text-white text-2xl font-medium mb-2">{activeCar.name}</h3>
+                      <p className="text-white/80">{activeCar.price.toLocaleString()} €</p>
+                    </div>
+                  </>
+                ) : null}
               </div>
             </div>
           </div>
