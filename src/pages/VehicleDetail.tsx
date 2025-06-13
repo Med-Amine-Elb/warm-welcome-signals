@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -10,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { Vehicle, vehicleService } from '@/services/vehicleService';
 import { 
   Breadcrumb,
   BreadcrumbItem,
@@ -18,19 +20,33 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-// Car inventory data
-const carsInventory = [
+// Mock car data with extended properties for the detail view
+const mockCarsInventory: (Vehicle & {
+  description: string;
+  specs: {
+    engine: string;
+    power: string;
+    acceleration: string;
+    maxSpeed: string;
+    transmission: string;
+    drive: string;
+    seats: number;
+    doors: number;
+  };
+  features: string[];
+  gallery: string[];
+})[] = [
   {
     id: 1,
     name: "Mercedes-Benz AMG GT",
-    price: "145 900",
-    image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fG1lcmNlZGVzJTIwYW1nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    year: 2023,
-    mileage: "9 000",
-    fuelType: "Essence",
     brand: "Mercedes-Benz",
+    price: 145900,
     category: "Sport",
+    fuelType: "Essence",
+    modelYear: 2023,
     description: "La Mercedes-Benz AMG GT incarne l'essence même du luxe sportif. Dotée d'un puissant moteur V8 biturbo, cette voiture offre des performances exceptionnelles et un design à couper le souffle qui ne manquera pas d'attirer tous les regards.",
+    imageFileName: "mercedes-amg-gt.jpg",
+    status: true,
     specs: {
       engine: "V8 Biturbo",
       power: "585 ch",
@@ -52,22 +68,22 @@ const carsInventory = [
       "Éclairage d'ambiance personnalisable"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fG1lcmNlZGVzJTIwYW1nJTIwZ3R8ZW58MHwwfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1577495508326-19a1b3cf65b1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8bWVyY2VkZXMlMjBhbWclMjBpbnRlcmlvcnxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1621069269775-2c7b33a51eaa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bWVyY2VkZXMlMjBhbWclMjBlbmdpbmV8ZW58MHwwfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1577495508326-19a1b3cf65b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1621069269775-2c7b33a51eaa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
     ]
   },
   {
     id: 2,
     name: "Audi R8 Spyder",
-    price: "189 500",
-    image: "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8YXVkaSUyMHI4fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    year: 2022,
-    mileage: "12 500",
-    fuelType: "Essence",
     brand: "Audi",
+    price: 189500,
     category: "Sport",
+    fuelType: "Essence",
+    modelYear: 2022,
     description: "L'Audi R8 Spyder représente le summum de la technologie et du design automobile. Son moteur V10 atmosphérique offre une sonorité incomparable et des sensations de conduite pures, tandis que son toit rétractable vous permet de profiter pleinement de chaque trajet.",
+    imageFileName: "audi-r8-spyder.jpg",
+    status: true,
     specs: {
       engine: "V10 5.2L FSI",
       power: "620 ch",
@@ -89,22 +105,22 @@ const carsInventory = [
       "Pack extérieur carbone"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1580274455191-1c62238fa332?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8YXVkaSUyMHI4fGVufDB8MHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGF1ZGklMjByOCUyMGludGVyaW9yfGVufDB8MHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTZ8fGF1ZGklMjByOCUyMGVuZ2luZXxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
     ]
   },
   {
     id: 3,
     name: "BMW M4 Competition",
-    price: "98 750",
-    image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTV8fGJtdyUyMG00fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    year: 2023,
-    mileage: "5 200",
-    fuelType: "Essence",
     brand: "BMW",
+    price: 98750,
     category: "Sport",
+    fuelType: "Essence",
+    modelYear: 2023,
     description: "La BMW M4 Competition allie performances extrêmes et utilisabilité quotidienne. Son design agressif, son châssis parfaitement équilibré et son six cylindres en ligne biturbo en font une référence dans sa catégorie pour les amateurs de conduite dynamique.",
+    imageFileName: "bmw-m4-competition.jpg",
+    status: true,
     specs: {
       engine: "6 cylindres en ligne biturbo",
       power: "510 ch",
@@ -126,59 +142,22 @@ const carsInventory = [
       "Pack Carbone M"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1607853554281-8c369112eacf?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGJtdyUyMG00fGVufDB8MHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Ym13JTIwbTQlMjBpbnRlcmlvcnxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1617814076668-3880958e6696?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8Ym13JTIwbTQlMjBlbmdpbmV8ZW58MHwwfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1617814076668-3880958e6696?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
     ]
   },
   {
     id: 4,
-    name: "Porsche 911 Carrera",
-    price: "155 400",
-    image: "https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cG9yc2NoZSUyMDkxMXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-    year: 2022,
-    mileage: "18 350",
-    fuelType: "Essence",
-    brand: "Porsche",
-    category: "Sport",
-    description: "La légendaire Porsche 911 Carrera continue d'évoluer tout en restant fidèle à son héritage. Cette icône du sport automobile combine une maniabilité exceptionnelle, des performances de haut niveau et un confort surprenant pour une utilisation quotidienne.",
-    specs: {
-      engine: "Flat-6 biturbo",
-      power: "450 ch",
-      acceleration: "3.7s (0-100 km/h)",
-      maxSpeed: "306 km/h",
-      transmission: "PDK 8 rapports",
-      drive: "Propulsion arrière",
-      seats: 2,
-      doors: 2,
-    },
-    features: [
-      "Système PCM avec navigation et Apple CarPlay",
-      "Sièges Sport Plus en cuir",
-      "Système audio Bose Surround Sound",
-      "Suspension PASM (Porsche Active Suspension Management)",
-      "Mode Sport et Sport Plus",
-      "Jantes Carrera Classic 20/21 pouces",
-      "Phares LED adaptatifs",
-      "Pack Chrono Sport avec sélecteur de mode"
-    ],
-    gallery: [
-      "https://images.unsplash.com/photo-1503376780353-7e66927e09f6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8cG9yc2NoZSUyMDkxMXxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fHBvcnNjaGUlMjA5MTElMjBpbnRlcmlvcnxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1571607388263-1044f9ea01dd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8cG9yc2NoZSUyMDkxMSUyMGVuZ2luZXxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
-    ]
-  },
-  {
-    id: 5,
     name: "Range Rover Sport",
-    price: "122 900",
-    image: "https://images.unsplash.com/photo-1529440547539-b8507892316d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8cmFuZ2Ugcm92ZXJ8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60",
-    year: 2023,
-    mileage: "7 200",
-    fuelType: "Diesel",
     brand: "Land Rover",
+    price: 122900,
     category: "SUV",
+    fuelType: "Diesel",
+    modelYear: 2023,
     description: "Le Range Rover Sport mêle luxe raffiné et performances tout-terrain exceptionnelles. Son design élégant, ses technologies avancées et son habitacle somptueux en font l'un des SUV les plus désirables du marché premium.",
+    imageFileName: "range-rover-sport.jpg",
+    status: true,
     specs: {
       engine: "V8 Diesel",
       power: "350 ch",
@@ -200,48 +179,11 @@ const carsInventory = [
       "Écrans arrière intégrés aux appuie-têtes"
     ],
     gallery: [
-      "https://images.unsplash.com/photo-1580414057403-c5f451f30e1c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZ2Ugcm92ZXIlMjBzcG9ydHxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8cmFuZ2Ulcm92ZXIlMjBpbnRlcmlvcnxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1550759340-a22a8f7e09f6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHJhbmdlJTIwcm92ZXIlMjBlbmdpbmV8ZW58MHwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1529440547539-b8507892316d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      "https://images.unsplash.com/photo-1550759340-a22a8f7e09f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
     ]
-  },
-  {
-    id: 6,
-    name: "Bentley Continental GT",
-    price: "245 700",
-    image: "https://images.unsplash.com/photo-1522686978237-a3962b9e959e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YmVudGxleXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-    year: 2022,
-    mileage: "15 200",
-    fuelType: "Essence",
-    brand: "Bentley",
-    category: "GT",
-    description: "La Bentley Continental GT est l'incarnation parfaite du grand tourisme de luxe. Alliant artisanat traditionnel et technologies de pointe, elle offre des performances exceptionnelles dans un écrin de raffinement absolu.",
-    specs: {
-      engine: "W12 6.0L biturbo",
-      power: "635 ch",
-      acceleration: "3.6s (0-100 km/h)",
-      maxSpeed: "333 km/h",
-      transmission: "Double embrayage 8 rapports",
-      drive: "Transmission intégrale",
-      seats: 4,
-      doors: 2,
-    },
-    features: [
-      "Système d'infodivertissement avec écran rotatif",
-      "Intérieur en cuir naturel avec boiseries précieuses",
-      "Système audio Naim for Bentley",
-      "Suspensions pneumatiques intelligentes",
-      "Système de conduite dynamique Bentley",
-      "Jantes forgées 22 pouces",
-      "Éclairage d'ambiance avec 7 thèmes",
-      "Cadrans analogiques plaqués or"
-    ],
-    gallery: [
-      "https://images.unsplash.com/photo-1566473965997-3de9c817e938?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8YmVudGxleSUyMGNvbnRpbmVudGFsfGVufDB8MHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1600706432502-77a0e2e32790?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YmVudGxleSUyMGludGVyaW9yfGVufDB8MHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-      "https://images.unsplash.com/photo-1621911864149-fc36cad3839f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8YmVudGxleSUyMGVuZ2luZXxlbnwwfDB8MHx8&auto=format&fit=crop&w=800&q=60",
-    ]
-  },
+  }
 ];
 
 const VehicleDetail = () => {
@@ -251,7 +193,6 @@ const VehicleDetail = () => {
   const [loading, setLoading] = useState(true);
   const [showTestDriveDialog, setShowTestDriveDialog] = useState(false);
   const [showInfoDialog, setShowInfoDialog] = useState(false);
-  const [showFinanceDialog, setShowFinanceDialog] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -264,10 +205,9 @@ const VehicleDetail = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    // Find the car by ID
     if (id) {
       const carId = parseInt(id, 10);
-      const foundCar = carsInventory.find(c => c.id === carId);
+      const foundCar = mockCarsInventory.find(c => c.id === carId);
       
       if (foundCar) {
         setCar(foundCar);
@@ -314,25 +254,7 @@ const VehicleDetail = () => {
     });
   };
 
-  const handleFinanceSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Demande de financement envoyée",
-      description: `Nous vous contacterons bientôt concernant les options de financement pour ${car.name}.`,
-    });
-    setShowFinanceDialog(false);
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      date: '',
-      message: '',
-    });
-  };
-
-  // Fonction pour ouvrir WhatsApp
   const openWhatsapp = () => {
-    // On utilisera un lien temporaire qui sera modifié par l'utilisateur plus tard
     const whatsappLink = "https://wa.me/212600000000";
     window.open(whatsappLink, '_blank');
   };
@@ -371,7 +293,8 @@ const VehicleDetail = () => {
     );
   }
 
-  const allImages = [car.image, ...car.gallery];
+  const mainImage = vehicleService.getImageUrl(car.imageFileName);
+  const allImages = [mainImage, ...car.gallery];
   
   const nextImage = () => {
     setCurrentImageIndex((prev) => 
@@ -409,7 +332,6 @@ const VehicleDetail = () => {
       </div>
       
       <main className="flex-grow">
-        {/* Car Details */}
         <section className="section-padding py-16">
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -471,18 +393,18 @@ const VehicleDetail = () => {
                     <div className="flex space-x-4 text-sm text-muted-foreground">
                       <div className="flex items-center">
                         <Calendar className="mr-1 h-4 w-4" />
-                        <span>{car.year}</span>
+                        <span>{car.modelYear}</span>
                       </div>
                       <div className="flex items-center">
                         <Navigation className="mr-1 h-4 w-4" />
-                        <span>{car.mileage} km</span>
+                        <span>{car.brand}</span>
                       </div>
                       <div className="flex items-center">
                         <Fuel className="mr-1 h-4 w-4" />
                         <span>{car.fuelType}</span>
                       </div>
                     </div>
-                    <span className="text-2xl font-bold text-accent">{car.price} €</span>
+                    <span className="text-2xl font-bold text-accent">{car.price.toLocaleString()} €</span>
                   </div>
                 </div>
                 
@@ -515,20 +437,6 @@ const VehicleDetail = () => {
                       <div>
                         <p className="font-medium">0-100 km/h</p>
                         <p className="text-sm text-muted-foreground">{car.specs.acceleration}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-0.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                      <div>
-                        <p className="font-medium">Vitesse max</p>
-                        <p className="text-sm text-muted-foreground">{car.specs.maxSpeed}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-0.5"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 6v4"/><path d="M12 14h.01"/></svg>
-                      <div>
-                        <p className="font-medium">Transmission</p>
-                        <p className="text-sm text-muted-foreground">{car.specs.transmission}</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
@@ -569,67 +477,46 @@ const VehicleDetail = () => {
               </div>
             </div>
             
-            {/* Additional Information */}
-            <div className="mt-16 space-y-10">
-              {/* Features */}
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Équipements</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {car.features.map((feature: string, index: number) => (
-                    <div key={index} className="flex items-start space-x-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1"><polyline points="20 6 9 17 4 12"/></svg>
-                      <span className="text-muted-foreground">{feature}</span>
+            {/* Features */}
+            <div className="mt-16">
+              <h2 className="text-2xl font-bold mb-6">Équipements</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {car.features.map((feature: string, index: number) => (
+                  <div key={index} className="flex items-start space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span className="text-muted-foreground">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Related Cars */}
+            <div className="mt-16">
+              <h2 className="text-2xl font-bold mb-6">Véhicules similaires</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {mockCarsInventory
+                  .filter(c => c.id !== car.id && c.category === car.category)
+                  .slice(0, 3)
+                  .map((relatedCar) => (
+                    <div key={relatedCar.id} className="glass-card overflow-hidden rounded-lg hover-scale">
+                      <Link to={`/vehicles/${relatedCar.id}`}>
+                        <div className="aspect-w-16 aspect-h-9">
+                          <img 
+                            src={vehicleService.getImageUrl(relatedCar.imageFileName)} 
+                            alt={relatedCar.name} 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="p-4">
+                          <h3 className="text-lg font-semibold">{relatedCar.name}</h3>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-sm text-muted-foreground">{relatedCar.modelYear}</span>
+                            <span className="text-accent font-bold">{relatedCar.price.toLocaleString()} €</span>
+                          </div>
+                        </div>
+                      </Link>
                     </div>
                   ))}
-                </div>
-              </div>
-              
-              {/* Related Cars */}
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Véhicules similaires</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {carsInventory
-                    .filter(c => c.id !== car.id && c.category === car.category)
-                    .slice(0, 3)
-                    .map((relatedCar) => (
-                      <div key={relatedCar.id} className="glass-card overflow-hidden rounded-lg hover-scale">
-                        <Link to={`/vehicles/${relatedCar.id}`}>
-                          <div className="aspect-w-16 aspect-h-9">
-                            <img 
-                              src={relatedCar.image} 
-                              alt={relatedCar.name} 
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="p-4">
-                            <h3 className="text-lg font-semibold">{relatedCar.name}</h3>
-                            <div className="flex justify-between items-center mt-2">
-                              <span className="text-sm text-muted-foreground">{relatedCar.year}</span>
-                              <span className="text-accent font-bold">{relatedCar.price} €</span>
-                            </div>
-                          </div>
-                        </Link>
-                      </div>
-                    ))}
-                </div>
-              </div>
-              
-              {/* CTA Section */}
-              <div className="bg-accent/10 p-8 rounded-lg text-center">
-                <h2 className="text-2xl font-bold mb-3">Vous avez des questions?</h2>
-                <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                  Notre équipe d'experts est à votre disposition pour répondre à toutes vos questions concernant ce véhicule ou nos services.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="mr-2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    Nous appeler
-                  </Button>
-                  <Button className="bg-accent hover:bg-accent/80">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="mr-2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                    Nous contacter
-                  </Button>
-                </div>
               </div>
             </div>
           </div>
@@ -765,68 +652,6 @@ const VehicleDetail = () => {
             </div>
             <DialogFooter>
               <Button type="submit">Envoyer la demande</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Financing Dialog */}
-      <Dialog open={showFinanceDialog} onOpenChange={setShowFinanceDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Demande de financement</DialogTitle>
-            <DialogDescription>
-              Complétez le formulaire ci-dessous pour recevoir des options de financement pour {car?.name} à {car?.price} €.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleFinanceSubmit} className="space-y-4">
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Nom complet</Label>
-                <Input 
-                  id="name" 
-                  name="name" 
-                  value={formData.name} 
-                  onChange={handleInputChange} 
-                  required 
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  name="email" 
-                  type="email" 
-                  value={formData.email} 
-                  onChange={handleInputChange} 
-                  required 
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="phone">Téléphone</Label>
-                <Input 
-                  id="phone" 
-                  name="phone" 
-                  type="tel" 
-                  value={formData.phone} 
-                  onChange={handleInputChange} 
-                  required 
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="message">Informations supplémentaires</Label>
-                <Textarea 
-                  id="message" 
-                  name="message" 
-                  value={formData.message} 
-                  onChange={handleInputChange} 
-                  rows={3}
-                  placeholder="Acompte, durée de financement souhaitée, etc."
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit">Demander un financement</Button>
             </DialogFooter>
           </form>
         </DialogContent>

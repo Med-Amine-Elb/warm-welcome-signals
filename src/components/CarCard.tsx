@@ -3,19 +3,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Navigation } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-interface Car {
-  id: number;
-  name: string;
-  price: string;
-  image: string;
-  year: number;
-  mileage: string;
-  fuelType: string;
-}
+import { Vehicle, vehicleService } from '@/services/vehicleService';
 
 interface CarCardProps {
-  car: Car;
+  car: Vehicle;
 }
 
 const CarCard = ({ car }: CarCardProps) => {
@@ -31,29 +22,29 @@ const CarCard = ({ car }: CarCardProps) => {
       {/* Car Image */}
       <div className="relative h-52 overflow-hidden">
         <img 
-          src={car.image} 
+          src={vehicleService.getImageUrl(car.imageFileName)} 
           alt={car.name} 
           className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
         />
         <div className="absolute top-3 right-3 bg-accent/90 text-white px-3 py-1 rounded-full text-sm font-medium">
-          {car.year}
+          {car.modelYear}
         </div>
       </div>
       
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-4">
           <h3 className="text-xl font-semibold">{car.name}</h3>
-          <p className="text-accent font-bold">{car.price} €</p>
+          <p className="text-accent font-bold">{car.price.toLocaleString()} €</p>
         </div>
         
         <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
           <div className="flex items-center">
             <Calendar className="mr-1 h-4 w-4" />
-            <span>{car.year}</span>
+            <span>{car.modelYear}</span>
           </div>
           <div className="flex items-center">
             <Navigation className="mr-1 h-4 w-4" />
-            <span>{car.mileage} km</span>
+            <span>{car.brand}</span>
           </div>
           <div>
             <span>{car.fuelType}</span>
