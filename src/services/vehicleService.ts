@@ -2,6 +2,17 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8081/api/products';
 
+export interface VehicleSpecs {
+  engine: string;
+  power: string;
+  acceleration: string;
+  maxSpeed: string;
+  transmission: string;
+  drive: string;
+  seats: number;
+  doors: number;
+}
+
 export interface Vehicle {
   id: number;
   name: string;
@@ -10,9 +21,13 @@ export interface Vehicle {
   category: string;
   fuelType: string;
   modelYear: number;
+  mileage: string; // Assuming mileage is a string like "9 000"
   description: string;
   imageFileName: string;
   status: boolean;
+  specs: VehicleSpecs; // Add specs
+  features: string[]; // Add features array
+  gallery: string[]; // Add gallery array of image file names
 }
 
 export interface PaginatedResponse<T> {

@@ -40,13 +40,26 @@ const Vehicles = () => {
 
   // Change page size to 4
   const PAGE_SIZE = 4;
+  const PAGINATION_THRESHOLD = 4;
 
+  const [allVehicles, setAllVehicles] = useState<Vehicle[]>([]);
+  const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
+  const [displayedVehicles, setDisplayedVehicles] = useState<Vehicle[]>([]);
+
+  // Fetch all vehicles and filter types initially
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         setIsLoading(true);
-        const [vehiclesData, categories, brands, fuelTypesData, priceRangeData, yearRangeData] = await Promise.all([
-          vehicleService.getAllVehicles(0, PAGE_SIZE),
+        const [
+          vehiclesData,
+          categories,
+          brands,
+          fuelTypesData,
+          priceRangeData,
+          yearRangeData
+        ] = await Promise.all([
+          vehicleService.getAllVehiclesWithoutPagination(),
           vehicleService.getAllCategories(),
           vehicleService.getAllBrands(),
           vehicleService.getFuelTypes(),
@@ -54,15 +67,17 @@ const Vehicles = () => {
           vehicleService.getYearRange()
         ]);
 
-        setVehicles(vehiclesData.content);
-        setTotalPages(vehiclesData.totalPages);
-        setActiveCar(vehiclesData.content[0]);
+        setAllVehicles(vehiclesData);
+        setFilteredVehicles(vehiclesData);
+        setDisplayedVehicles(vehiclesData.slice(0, PAGE_SIZE));
+        setTotalPages(Math.ceil(vehiclesData.length / PAGE_SIZE));
+        setActiveCar(vehiclesData[0] || null);
         setUniqueCategories(categories);
         setUniqueBrands(brands);
         setFuelTypes(fuelTypesData);
         setPriceRange([priceRangeData.min, priceRangeData.max]);
         setYearRange([yearRangeData.min, yearRangeData.max]);
-        setFadeKey(prev => prev + 1); // trigger fade-in
+        setFadeKey(prev => prev + 1);
       } catch (error) {
         console.error('Error fetching initial data:', error);
       } finally {
@@ -72,6 +87,93 @@ const Vehicles = () => {
 
     fetchInitialData();
   }, []);
+
+  // Apply filters whenever any filter changes
+  useEffect(() => {
+    let filtered = [...allVehicles];
+
+    // Apply category filter
+    if (categoryFilter) {
+      filtered = filtered.filter(car => car.category === categoryFilter);
+    }
+
+    // Apply brand filter
+    if (brandFilter) {
+      filtered = filtered.filter(car => car.brand === brandFilter);
+    }
+
+    // Apply fuel type filter
+    if (fuelTypeFilter) {
+      filtered = filtered.filter(car => car.fuelType === fuelTypeFilter);
+    }
+
+    // Apply price range filter
+    filtered = filtered.filter(car => 
+      car.price >= priceRange[0] && car.price <= priceRange[1]
+    );
+
+    // Apply year range filter
+    filtered = filtered.filter(car => 
+      car.modelYear >= yearRange[0] && car.modelYear <= yearRange[1]
+    );
+
+    // Apply selected categories filter
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(car => 
+        selectedCategories.includes(car.category)
+      );
+    }
+
+    // Apply selected brands filter
+    if (selectedBrands.length > 0) {
+      filtered = filtered.filter(car => 
+        selectedBrands.includes(car.brand)
+      );
+    }
+
+    // Apply selected fuel types filter
+    if (selectedFuelTypes.length > 0) {
+      filtered = filtered.filter(car => 
+        selectedFuelTypes.includes(car.fuelType)
+      );
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      if (sortOrder === 'price-asc') {
+        return a.price - b.price;
+      } else if (sortOrder === 'price-desc') {
+        return b.price - a.price;
+      } else if (sortOrder === 'year-asc') {
+        return a.modelYear - b.modelYear;
+      } else {
+        return b.modelYear - a.modelYear;
+      }
+    });
+
+    setFilteredVehicles(filtered);
+    setCurrentPage(0); // Reset to first page when filters change
+  }, [
+    allVehicles,
+    categoryFilter,
+    brandFilter,
+    fuelTypeFilter,
+    priceRange,
+    yearRange,
+    selectedCategories,
+    selectedBrands,
+    selectedFuelTypes,
+    sortOrder
+  ]);
+
+  // Update displayed vehicles when page or filtered vehicles change
+  useEffect(() => {
+    const start = currentPage * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    setDisplayedVehicles(filteredVehicles.slice(start, end));
+    setTotalPages(Math.ceil(filteredVehicles.length / PAGE_SIZE));
+    setActiveCar(filteredVehicles[start] || null);
+  }, [currentPage, filteredVehicles]);
 
   const resetFilters = () => {
     setPriceOrder('asc');
@@ -84,7 +186,6 @@ const Vehicles = () => {
     setSelectedFuelTypes([]);
     setSortOrder('price-asc');
     setCurrentPage(0);
-    fetchVehicles();
   };
 
   const fetchVehicles = async () => {
@@ -92,27 +193,66 @@ const Vehicles = () => {
       setIsLoading(true);
       let response;
       
+      response = await vehicleService.getAllVehicles(
+        currentPage,
+        PAGE_SIZE,
+        sortOrder.includes('price') ? 'price' : 'modelYear',
+        sortOrder.includes('desc') ? 'DESC' : 'ASC'
+      );
+
+      // Apply filters on the client side
+      let filteredContent = response.content;
+      
+      // Apply category filter
+      if (categoryFilter) {
+        filteredContent = filteredContent.filter(car => car.category === categoryFilter);
+      }
+      
+      // Apply brand filter
+      if (brandFilter) {
+        filteredContent = filteredContent.filter(car => car.brand === brandFilter);
+      }
+      
+      // Apply fuel type filter
       if (fuelTypeFilter) {
-        response = await vehicleService.getVehiclesByFuelType(
-          fuelTypeFilter,
-          currentPage,
-          PAGE_SIZE,
-          sortOrder.includes('price') ? 'price' : 'modelYear',
-          sortOrder.includes('desc') ? 'DESC' : 'ASC'
+        filteredContent = filteredContent.filter(car => car.fuelType === fuelTypeFilter);
+      }
+      
+      // Apply price range filter
+      filteredContent = filteredContent.filter(car => 
+        car.price >= priceRange[0] && car.price <= priceRange[1]
+      );
+      
+      // Apply year range filter
+      filteredContent = filteredContent.filter(car => 
+        car.modelYear >= yearRange[0] && car.modelYear <= yearRange[1]
+      );
+      
+      // Apply selected categories filter
+      if (selectedCategories.length > 0) {
+        filteredContent = filteredContent.filter(car => 
+          selectedCategories.includes(car.category)
         );
-      } else {
-        response = await vehicleService.getAllVehicles(
-          currentPage,
-          PAGE_SIZE,
-          sortOrder.includes('price') ? 'price' : 'modelYear',
-          sortOrder.includes('desc') ? 'DESC' : 'ASC'
+      }
+      
+      // Apply selected brands filter
+      if (selectedBrands.length > 0) {
+        filteredContent = filteredContent.filter(car => 
+          selectedBrands.includes(car.brand)
+        );
+      }
+      
+      // Apply selected fuel types filter
+      if (selectedFuelTypes.length > 0) {
+        filteredContent = filteredContent.filter(car => 
+          selectedFuelTypes.includes(car.fuelType)
         );
       }
 
-      setVehicles(response.content);
-      setTotalPages(response.totalPages);
+      setVehicles(filteredContent);
+      setTotalPages(Math.ceil(filteredContent.length / PAGE_SIZE));
       // Always select the first car of the new page
-      setActiveCar(response.content[0] || null);
+      setActiveCar(filteredContent[0] || null);
       setFadeKey(prev => prev + 1); // trigger fade-in
     } catch (error) {
       console.error('Error fetching vehicles:', error);
@@ -122,9 +262,10 @@ const Vehicles = () => {
   };
 
   useEffect(() => {
+    setCurrentPage(0); // Reset to first page when filters change
     fetchVehicles();
     // eslint-disable-next-line
-  }, [currentPage, sortOrder, fuelTypeFilter]);
+  }, [sortOrder, categoryFilter, brandFilter, fuelTypeFilter, priceRange, yearRange, selectedCategories, selectedBrands, selectedFuelTypes]);
 
   const filteredCars = vehicles
     // Apply quick filters
@@ -159,6 +300,28 @@ const Vehicles = () => {
       return selectedFuelTypes.includes(car.fuelType);
     })
     .filter(car => car.modelYear >= yearRange[0] && car.modelYear <= yearRange[1]);
+
+  // Update filter handlers to trigger fetch
+  const handlePriceOrderChange = (order: 'asc' | 'desc') => {
+    setPriceOrder(order);
+    setSortOrder(`price-${order}`);
+    setCurrentPage(0);
+  };
+
+  const handleCategoryFilter = (category: string) => {
+    setCategoryFilter(category);
+    setCurrentPage(0);
+  };
+
+  const handleBrandFilter = (brand: string) => {
+    setBrandFilter(brand);
+    setCurrentPage(0);
+  };
+
+  const handleFuelTypeFilter = (fuelType: string) => {
+    setFuelTypeFilter(fuelType);
+    setCurrentPage(0);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -231,13 +394,13 @@ const Vehicles = () => {
                       <>
                         <button
                           className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${priceOrder === 'asc' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
-                          onClick={() => setPriceOrder('asc')}
+                          onClick={() => handlePriceOrderChange('asc')}
                         >
                           Croissant
                         </button>
                         <button
                           className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${priceOrder === 'desc' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
-                          onClick={() => setPriceOrder('desc')}
+                          onClick={() => handlePriceOrderChange('desc')}
                         >
                           Décroissant
                         </button>
@@ -247,7 +410,7 @@ const Vehicles = () => {
                       <>
                         <button
                           className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${categoryFilter === '' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
-                          onClick={() => setCategoryFilter('')}
+                          onClick={() => handleCategoryFilter('')}
                         >
                           Toutes
                         </button>
@@ -255,7 +418,7 @@ const Vehicles = () => {
                           <button
                             key={cat}
                             className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${categoryFilter === cat ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
-                            onClick={() => setCategoryFilter(cat)}
+                            onClick={() => handleCategoryFilter(cat)}
                           >
                             {cat}
                           </button>
@@ -266,7 +429,7 @@ const Vehicles = () => {
                       <>
                         <button
                           className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${brandFilter === '' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
-                          onClick={() => setBrandFilter('')}
+                          onClick={() => handleBrandFilter('')}
                         >
                           Toutes
                         </button>
@@ -274,7 +437,7 @@ const Vehicles = () => {
                           <button
                             key={brand}
                             className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${brandFilter === brand ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
-                            onClick={() => setBrandFilter(brand)}
+                            onClick={() => handleBrandFilter(brand)}
                           >
                             {brand}
                           </button>
@@ -285,7 +448,7 @@ const Vehicles = () => {
                       <>
                         <button
                           className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${fuelTypeFilter === '' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
-                          onClick={() => setFuelTypeFilter('')}
+                          onClick={() => handleFuelTypeFilter('')}
                         >
                           Toutes
                         </button>
@@ -293,7 +456,7 @@ const Vehicles = () => {
                           <button
                             key={fuel}
                             className={`text-sm uppercase tracking-wide font-semibold bg-transparent border-0 border-b-2 transition-all duration-200 ${fuelTypeFilter === fuel ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black hover:border-black'}`}
-                            onClick={() => setFuelTypeFilter(fuel)}
+                            onClick={() => handleFuelTypeFilter(fuel)}
                           >
                             {fuel}
                           </button>
@@ -477,7 +640,7 @@ const Vehicles = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 h-full mt-8">
               {/* Left Column: Vehicle List */}
               <div className="bg-white p-6 md:p-12 lg:p-24 h-full overflow-y-auto">
-                {filteredCars.map((car, index) => (
+                {displayedVehicles.map((car, index) => (
                   <div 
                     key={car.id}
                     className={`border-b border-gray-100 py-8 cursor-pointer transition-all duration-500 ${car.id === activeCar?.id ? 'opacity-100' : 'opacity-50 hover:opacity-80'} animate-fade-in`}
@@ -506,49 +669,51 @@ const Vehicles = () => {
                   </div>
                 ))}
                 {/* Improved Pagination Controls */}
-                <div className="flex justify-center gap-2 mt-8">
-                  <Button
-                    variant="outline"
-                    disabled={currentPage === 0}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                  >
-                    Previous
-                  </Button>
-                  {[...Array(totalPages)].map((_, idx) => (
+                {filteredVehicles.length > PAGINATION_THRESHOLD && (
+                  <div className="flex justify-center gap-2 mt-8">
                     <Button
-                      key={idx}
-                      variant={currentPage === idx ? "default" : "outline"}
-                      onClick={() => setCurrentPage(idx)}
-                      className={currentPage === idx ? "font-bold" : ""}
+                      variant="outline"
+                      disabled={currentPage === 0}
+                      onClick={() => setCurrentPage(currentPage - 1)}
                     >
-                      {idx + 1}
+                      Previous
                     </Button>
-                  ))}
-                  <Button
-                    variant="outline"
-                    disabled={currentPage + 1 >= totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
+                    {[...Array(totalPages)].map((_, idx) => (
+                      <Button
+                        key={idx}
+                        variant={currentPage === idx ? "default" : "outline"}
+                        onClick={() => setCurrentPage(idx)}
+                        className={currentPage === idx ? "font-bold" : ""}
+                      >
+                        {idx + 1}
+                      </Button>
+                    ))}
+                    <Button
+                      variant="outline"
+                      disabled={currentPage + 1 >= totalPages}
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
               </div>
               
               {/* Right Column: Selected Vehicle Image */}
               <div className="relative h-[calc(100vh-200px)]">
                 {activeCar ? (
                   <>
-                    <img
+                <img
                       key={fadeKey}
                       src={activeCar.imageFileName ? vehicleService.getImageUrl(activeCar.imageFileName) : '/fallback-car.png'}
-                      alt={activeCar.name}
+                  alt={activeCar.name}
                       className="w-full h-full object-cover animate-fade-in"
                       onError={e => { e.currentTarget.src = '/fallback-car.png'; }}
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
-                      <h3 className="text-white text-2xl font-medium mb-2">{activeCar.name}</h3>
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
+                  <h3 className="text-white text-2xl font-medium mb-2">{activeCar.name}</h3>
                       <p className="text-white/80">{activeCar.price.toLocaleString()} €</p>
-                    </div>
+                </div>
                   </>
                 ) : null}
               </div>
