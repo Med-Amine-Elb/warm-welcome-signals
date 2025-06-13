@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8081/api/products';
@@ -69,54 +70,160 @@ export interface YearRange {
   max: number;
 }
 
+// Mock data for development
+const mockVehicles: Vehicle[] = [
+  {
+    id: 1,
+    name: "Mercedes-Benz AMG GT",
+    brand: "Mercedes-Benz",
+    price: 145900,
+    category: "Sport",
+    fuelType: "Essence",
+    modelYear: 2023,
+    description: "La Mercedes-Benz AMG GT incarne l'essence même du luxe sportif.",
+    imageFileName: "mercedes-amg-gt.jpg",
+    status: true,
+  },
+  {
+    id: 2,
+    name: "Audi R8 Spyder",
+    brand: "Audi",
+    price: 189500,
+    category: "Sport",
+    fuelType: "Essence",
+    modelYear: 2022,
+    description: "L'Audi R8 Spyder représente le summum de la technologie et du design automobile.",
+    imageFileName: "audi-r8-spyder.jpg",
+    status: true,
+  },
+  {
+    id: 3,
+    name: "BMW M4 Competition",
+    brand: "BMW",
+    price: 98750,
+    category: "Sport",
+    fuelType: "Essence",
+    modelYear: 2023,
+    description: "La BMW M4 Competition allie performances extrêmes et utilisabilité quotidienne.",
+    imageFileName: "bmw-m4-competition.jpg",
+    status: true,
+  },
+  {
+    id: 4,
+    name: "Range Rover Sport",
+    brand: "Land Rover",
+    price: 122900,
+    category: "SUV",
+    fuelType: "Diesel",
+    modelYear: 2023,
+    description: "Le Range Rover Sport mêle luxe raffiné et performances tout-terrain exceptionnelles.",
+    imageFileName: "range-rover-sport.jpg",
+    status: true,
+  }
+];
+
 export const vehicleService = {
   getAllVehicles: async (page = 0, size = 10, sortBy = 'id', sortOrder = 'DESC') => {
-    const response = await axios.get<PaginatedResponse<Vehicle>>(`${API_BASE_URL}/all`, {
-      params: { page, size, sortBy, sortOrder }
-    });
-    return response.data;
+    // For development, return mock data
+    const start = page * size;
+    const end = start + size;
+    const content = mockVehicles.slice(start, end);
+    
+    const mockResponse: PaginatedResponse<Vehicle> = {
+      content,
+      pageable: {
+        sort: { sorted: true, unsorted: false, empty: false },
+        pageNumber: page,
+        pageSize: size,
+        offset: start,
+        paged: true,
+        unpaged: false,
+      },
+      totalPages: Math.ceil(mockVehicles.length / size),
+      totalElements: mockVehicles.length,
+      last: end >= mockVehicles.length,
+      first: page === 0,
+      sort: { sorted: true, unsorted: false, empty: false },
+      number: page,
+      numberOfElements: content.length,
+      size: size,
+      empty: content.length === 0,
+    };
+    
+    return mockResponse;
   },
 
   getAllVehiclesWithoutPagination: async () => {
-    const response = await axios.get<Vehicle[]>(`${API_BASE_URL}/all-no-pagination`);
-    return response.data;
+    return mockVehicles;
   },
 
   getVehicleById: async (id: number) => {
-    const response = await axios.get<Vehicle>(`${API_BASE_URL}/${id}`);
-    return response.data;
+    const vehicle = mockVehicles.find(v => v.id === id);
+    if (!vehicle) {
+      throw new Error('Vehicle not found');
+    }
+    return vehicle;
   },
 
   getVehiclesByFuelType: async (fuelType: string, page = 0, size = 10, sortBy = 'id', sortOrder = 'DESC') => {
-    const response = await axios.get<PaginatedResponse<Vehicle>>(`${API_BASE_URL}/filterFuel`, {
-      params: { filterFuel: fuelType, page, size, sortBy, sortOrder }
-    });
-    return response.data;
+    const filtered = mockVehicles.filter(v => v.fuelType === fuelType);
+    const start = page * size;
+    const end = start + size;
+    const content = filtered.slice(start, end);
+    
+    const mockResponse: PaginatedResponse<Vehicle> = {
+      content,
+      pageable: {
+        sort: { sorted: true, unsorted: false, empty: false },
+        pageNumber: page,
+        pageSize: size,
+        offset: start,
+        paged: true,
+        unpaged: false,
+      },
+      totalPages: Math.ceil(filtered.length / size),
+      totalElements: filtered.length,
+      last: end >= filtered.length,
+      first: page === 0,
+      sort: { sorted: true, unsorted: false, empty: false },
+      number: page,
+      numberOfElements: content.length,
+      size: size,
+      empty: content.length === 0,
+    };
+    
+    return mockResponse;
   },
 
   getAllBrands: async () => {
-    const response = await axios.get<string[]>(`${API_BASE_URL}/brands`);
-    return response.data;
+    const brands = [...new Set(mockVehicles.map(v => v.brand))];
+    return brands;
   },
 
   getAllCategories: async () => {
-    const response = await axios.get<string[]>(`${API_BASE_URL}/categories`);
-    return response.data;
+    const categories = [...new Set(mockVehicles.map(v => v.category))];
+    return categories;
   },
 
   getPriceRange: async () => {
-    const response = await axios.get<PriceRange>(`${API_BASE_URL}/price-range`);
-    return response.data;
+    const prices = mockVehicles.map(v => v.price);
+    return {
+      min: Math.min(...prices),
+      max: Math.max(...prices)
+    };
   },
 
   getYearRange: async () => {
-    const response = await axios.get<YearRange>(`${API_BASE_URL}/year-range`);
-    return response.data;
+    const years = mockVehicles.map(v => v.modelYear);
+    return {
+      min: Math.min(...years),
+      max: Math.max(...years)
+    };
   },
 
   getFuelTypes: async () => {
-    const response = await axios.get<string[]>(`${API_BASE_URL}/fuel-types`);
-    return response.data;
+    const fuelTypes = [...new Set(mockVehicles.map(v => v.fuelType))];
+    return fuelTypes;
   },
 
   createVehicle: async (vehicleData: FormData) => {
@@ -160,6 +267,14 @@ export const vehicleService = {
   },
 
   getImageUrl: (imageFilename: string) => {
-    return `http://localhost:8081/image/${imageFilename}`;
+    // For development, return placeholder images based on the filename
+    const imageMap: Record<string, string> = {
+      'mercedes-amg-gt.jpg': 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'audi-r8-spyder.jpg': 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'bmw-m4-competition.jpg': 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'range-rover-sport.jpg': 'https://images.unsplash.com/photo-1529440547539-b8507892316d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+    };
+    
+    return imageMap[imageFilename] || `http://localhost:8081/image/${imageFilename}`;
   }
 }; 
