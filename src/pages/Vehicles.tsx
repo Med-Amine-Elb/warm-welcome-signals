@@ -104,7 +104,7 @@ const Vehicles = () => {
 
     // Apply fuel type filter
     if (fuelTypeFilter) {
-      filtered = filtered.filter(car => car.fuelType === fuelTypeFilter);
+      filtered = filtered.filter(car => car.fuelTypes === fuelTypeFilter);
     }
 
     // Apply price range filter
@@ -134,7 +134,7 @@ const Vehicles = () => {
     // Apply selected fuel types filter
     if (selectedFuelTypes.length > 0) {
       filtered = filtered.filter(car => 
-        selectedFuelTypes.includes(car.fuelType)
+        selectedFuelTypes.includes(car.fuelTypes)
       );
     }
 
@@ -215,7 +215,7 @@ const Vehicles = () => {
       
       // Apply fuel type filter
       if (fuelTypeFilter) {
-        filteredContent = filteredContent.filter(car => car.fuelType === fuelTypeFilter);
+        filteredContent = filteredContent.filter(car => car.fuelTypes === fuelTypeFilter);
       }
       
       // Apply price range filter
@@ -245,7 +245,7 @@ const Vehicles = () => {
       // Apply selected fuel types filter
       if (selectedFuelTypes.length > 0) {
         filteredContent = filteredContent.filter(car => 
-          selectedFuelTypes.includes(car.fuelType)
+          selectedFuelTypes.includes(car.fuelTypes)
         );
       }
 
@@ -271,7 +271,7 @@ const Vehicles = () => {
     // Apply quick filters
     .filter(car => (categoryFilter ? car.category === categoryFilter : true))
     .filter(car => (brandFilter ? car.brand === brandFilter : true))
-    .filter(car => (fuelTypeFilter ? car.fuelType === fuelTypeFilter : true))
+    .filter(car => (fuelTypeFilter ? car.fuelTypes === fuelTypeFilter : true))
     .sort((a, b) => {
       if (sortOrder === 'price-asc') {
         return a.price - b.price;
@@ -297,7 +297,7 @@ const Vehicles = () => {
     })
     .filter(car => {
       if (selectedFuelTypes.length === 0) return true;
-      return selectedFuelTypes.includes(car.fuelType);
+      return selectedFuelTypes.includes(car.fuelTypes);
     })
     .filter(car => car.modelYear >= yearRange[0] && car.modelYear <= yearRange[1]);
 

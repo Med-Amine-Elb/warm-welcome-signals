@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Navigation } from 'lucide-react';
@@ -26,7 +25,7 @@ const CarCard = ({ car }: CarCardProps) => {
           alt={car.name} 
           className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
         />
-        <div className="absolute top-3 right-3 bg-accent/90 text-white px-3 py-1 rounded-full text-sm font-medium">
+        <div className="absolute top-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">
           {car.modelYear}
         </div>
       </div>
@@ -47,7 +46,7 @@ const CarCard = ({ car }: CarCardProps) => {
             <span>{car.brand}</span>
           </div>
           <div>
-            <span>{car.fuelType}</span>
+            <span>{car.fuelTypes}</span>
           </div>
         </div>
         
